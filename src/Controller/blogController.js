@@ -64,7 +64,7 @@ const getBlogs = async function (req, res) {
       res.status(500).send({ status: false, err: error.message });
     }
   };
-// delete blog by id
+
 
 
 
@@ -114,7 +114,7 @@ const deleteById = async function (req, res) {
     {
         res.status(400).send({status:false,msg:"This data is not publised "})
     }  
-  }
+  };
 
 
 
