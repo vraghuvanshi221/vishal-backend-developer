@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 // Author API's == Create an author - atleast 5 authors
-router.post('/authors',authorController.createAuthor)
+router.post('/authors', authorController.createAuthor)
 
 
 
@@ -14,9 +14,9 @@ router.post('/authors',authorController.createAuthor)
 // Blog API's
 router.post('/blogs',blogMiddleware.isAuthorIdValid,blogController.createBlog)
 
+router.put("/blogs/:blogId", blogController.updateBlog)
+router.delete("/DELETE /blogs?queryParams", blogController.deleteBlog)
 
 
 
-
-
-module.exports= router;
+module.exports = router;
