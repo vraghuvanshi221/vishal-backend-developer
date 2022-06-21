@@ -27,8 +27,8 @@ const authorSchema = new mongoose.Schema({
 
  password:{
     type:String,
-    unique:true,
     require:true
- } })
+ }
+},{timestamps: true})
 
  module.exports = mongoose.model('author-project', authorSchema) 
