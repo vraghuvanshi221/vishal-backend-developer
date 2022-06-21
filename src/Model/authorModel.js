@@ -27,7 +27,6 @@ const authorSchema = new mongoose.Schema({
 
  password:{
     type:String,
-    unique:true,
     require:true
  } })
 

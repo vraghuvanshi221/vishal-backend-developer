@@ -1,5 +1,17 @@
-const blogModel = require("../Model/blogModel")
+let blogModel= require('../Model/blogModel')
 const  mongoose = require("mongoose")
+
+let createBlog = async function(req,res)
+{
+   try{
+    let data = req.body;
+    let newBlogObject= await blogModel.create(data)
+    res.status(201).send({status:true, data:newBlogObject})
+   }catch(err){
+    res.status(500).send({status:false,msg:"Internal problem"})
+   } 
+};
+
 
 const getBlogs = async function (req, res) {
     try {
@@ -47,6 +59,8 @@ const getBlogs = async function (req, res) {
     }
   };
 
+
+  
 const updateBlog = async function (req, res) {
     try {
         let blogId = req.params.blogId
@@ -64,6 +78,35 @@ const updateBlog = async function (req, res) {
     }
 };
 
+
+
+// delete blog by id
+
+const blogModel = require("../Model/blogModel")
+
+
+let deleteBlogs = async(req, res) => {
+    try{
+        let blogId = req.params.blogId;
+
+    let blog = await blogModel.findById(blogId);
+      
+       if(!blog){
+     return  res.status(404).send({status:false ,msg: "id is not found" })
+       }
+
+       if(blog.isdeleted === true){
+        return  res.status(404).send({status:false ,msg: "blog  is already deleted" })
+       }
+       let deleteBlog = await blogModel.findByIdAndUpdate({_id:blogId},{isdeleted : true})
+       res.status(200).send()
+    }catch(error){
+        console.log(err)
+        res.status(500).send({status:false, msg: err.message})
+    }
+};
+
+
 const deleteBlog = async function (req, res) {
     let blogId = req.query.queryParams
     let blog = await blogModel.findById(blogId);
@@ -75,10 +118,11 @@ const deleteBlog = async function (req, res) {
 module.exports.getBlogs =getBlogs
 module.exports.updateBlog = updateBlog;
 module.exports.deleteBlog = deleteBlog;
-
+module.exports.deleteBlogs = deleteBlogs
+module.exports.createBlog = createBlog
 //const blogModel = require("../Model/blogModel")
 
 
   
 
- 
+
