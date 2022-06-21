@@ -10,14 +10,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 
-mongoose.connect("mongodb+srv://vishal221:QbG4QZXzT3SrfBAF@cluster0.jegkx.mongodb.net/vishal-db",
+mongoose.connect("mongodb+srv://pattamu:iKHwECgQCaYNVpge@sandeepcluster.9rzkh.mongodb.net/ashwin5196",
    { useNewUrlParser:true })
-
-
-mongoose.connect("", {
-    useNewUrlParser: true
-})
-
 .then( () => console.log("MongoDb is connected"))
 .catch ( err => console.log(err) )
 

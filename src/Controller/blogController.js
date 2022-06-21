@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+const  mongoose = require("mongoose")
 let blogModel= require('../Model/blogModel')
 
 let createBlog = async function(req,res)
@@ -12,69 +12,6 @@ let createBlog = async function(req,res)
    } 
 }
 
-// delete blog by id
-
-const blogModel = require("../Model/blogModel")
-
-
-let deleteBlogs = async(req, res) => {
-    try{
-        let blogId = req.params.blogId;
-
-    let blog = await blogModel.findById(blogId);
-      
-       if(!blog){
-     return  res.status(404).send({status:false ,msg: "id is not found" })
-       }
-
-       if(blog.isdeleted === true){
-        return  res.status(404).send({status:false ,msg: "blog  is already deleted" })
-       }
-       let deleteBlog = await blogModel.findByIdAndUpdate({_id:blogId},{isdeleted : true})
-       res.status(200).send()
-    }catch(error){
-        console.log(err)
-        res.status(500).send({status:false, msg: err.message})
-    }
-}
-
-module.exports.deleteBlogs = deleteBlogs
-module.exports.createBlog = createBlog
-=======
-const blogModel = require("../Model/blogModel")
-
-
-
-const updateBlog = async function (req, res) {
-    try {
-        let blogId = req.params.blogId
-        let blog = await blogModel.findById(blogId);
-
-        if (!blog) {
-            return res.status(404).send("No such exits blog ");
-        };
-        let blogData = req.body;
-        let updateBlog = await blogModel.findOneAndUpdate({ _id: blogId }, blogData);
-        return res.status(200).send({ status: true, data: updateBlog });
-    }
-    catch (err) {
-        return res.status(500).send({ status: false, msg: "Internal Server Error" })
-    }
-};
-
-const deleteBlog = async function (req, res) {
-    let blogId = req.query.queryParams
-    let blog = await blogModel.findById(blogId);
-    if (!blog)
-        res.status(404).send({ status: false, msg: "Data doesn't exits" })
-    // let updateBlog= await blogModel.findOneAndUpdate({_id:userId},{$set:{isDeleted:true}},{new:true})
-    // res.send ({status:true,data:updateBlog})
-};
-
-module.exports.updateBlog = updateBlog;
-module.exports.deleteBlog = deleteBlog;
-const  mongoose = require("mongoose")
-//const blogModel = require("../Model/blogModel")
 
 const getBlogs = async function (req, res) {
     try {
@@ -82,18 +19,23 @@ const getBlogs = async function (req, res) {
       let filter = {
         isdeleted: false,
         isPublished: true,
-    
+      ...data
       };
  
-      const { category, subcategory, tags } = data
+      const { authorId,category, subcategory, tags } = data
   
       if (category) {
-        let verifyCategory = await blogModel.findOne({ category: category })
+        let verifyCategory = await blogModel.findOne({ category: authorId })
         if (!verifyCategory) {
           return res.status(404).send({ status: false, msg: 'No blogs in this category exist' })
         }
       }
-  
+      if (authorId) {
+        let verifyCategory = await blogModel.findOne({ authorId: authorId })
+        if (!verifyCategory) {
+            return res.status(404).send({ status: false, msg: 'author id is not exists' })
+        }
+    }
       if (tags) {
   
         if (!await blogModel.exists(tags)) {
@@ -121,7 +63,32 @@ const getBlogs = async function (req, res) {
       res.status(500).send({ status: false, err: error.message });
     }
   };
+// delete blog by id
+
+
+const updateBlog = async function (req, res) {
+    try {
+        let blogId = req.params.blogId
+        let blog = await blogModel.findById(blogId);
+
+        if (!blog) {
+            return res.status(404).send("No such exits blog ");
+        };
+        let blogData = req.body;
+        let updateBlog = await blogModel.findOneAndUpdate({ _id: blogId }, blogData);
+        return res.status(200).send({ status: true, data: updateBlog });
+    }
+    catch (err) {
+        return res.status(500).send({ status: false, msg: "Internal Server Error" })
+    }
+};
+
+
+
+
+
+
+module.exports={createBlog ,getBlogs,updateBlog,}
   
 
-  module.exports.getBlogs =getBlogs
->>>>>>> 23e995909ed6555e04f4504391053537db2cf4c1
+ 

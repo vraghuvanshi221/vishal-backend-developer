@@ -17,6 +17,6 @@ router.post('/blogs',blogMiddleware.isAuthorIdValid,blogController.createBlog)
 router.put("/blogs/:blogId", blogController.updateBlog)
 router.delete("/DELETE /blogs?queryParams", blogController.deleteBlog)
 
-
+router.get("/blogs", blogController.getBlogs)
 
 module.exports = router;
