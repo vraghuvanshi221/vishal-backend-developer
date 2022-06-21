@@ -1,16 +1,17 @@
+
 const  mongoose = require("mongoose")
 let blogModel= require('../Model/blogModel')
 
-let createBlog = async function(req,res)
-{
-   try{
-    let data = req.body;
-    let newBlogObject= await blogModel.create(data)
-    res.status(201).send({status:true, data:newBlogObject})
-   }catch(err){
-    res.status(500).send({status:false,msg:"Internal problem"})
-   } 
+let createBlog = async function (req, res) {
+    try {
+        let data = req.body;
+        let newBlogObject = await blogModel.create(data)
+        res.status(201).send({ status: true, data: newBlogObject })
+    } catch (err) {
+        res.status(500).send({ status: false, msg: "Internal problem" })
+    }
 }
+
 
 
 const getBlogs = async function (req, res) {
@@ -66,9 +67,12 @@ const getBlogs = async function (req, res) {
 // delete blog by id
 
 
-const updateBlog = async function (req, res) {
+
+// =======================================================================
+const updateBlog= async function (req, res) {
     try {
         let blogId = req.params.blogId
+        
         let blog = await blogModel.findById(blogId);
 
         if (!blog) {
@@ -85,10 +89,60 @@ const updateBlog = async function (req, res) {
 
 
 
+// working 
+
+const deleteById = async function (req, res) {
+    
+    let blog = req.params.blogId
+    console.log(blog)
+    
+    if(!blog){
+        return res.status(400).send({status : false, msg : "blogId must be present in order to delete it"})
+    }
+       
+    if(!mongoose.Types.ObjectId.isValid(blog)){
+        return res.status(404).send({status: false, msg: "Please provide a Valid blogId"})
+    }
+    let fullObject = await blogModel.findOne({_id:blog})
+    
+    if(fullObject.isPublished != false && fullObject.isdeleted==false) 
+    {
+        let newData = await blogModel.findByIdAndUpdate(blog , {$set:{isdeleted:true}})
+        res.status(200).send()
+    }
+    else
+    {
+        res.status(400).send({status:false,msg:"This data is not publised "})
+    }  
+  }
 
 
 
-module.exports={createBlog ,getBlogs,updateBlog,}
-  
 
- 
+
+
+
+
+
+
+
+
+
+
+
+// delete using query params --->check
+const deleteBlog = async function (req, res) {
+    let blogId = req.query
+    let blog = await blogModel.findById(blogId);
+    if (!blog)
+        res.status(404).send({ status: false, msg: "Data doesn't exits" })
+    // let updateBlog= await blogModel.findOneAndUpdate({_id:userId},{$set:{isDeleted:true}},{new:true})
+    // res.send ({status:true,data:updateBlog})
+};
+
+
+
+module.exports = {
+    getBlogs, deleteBlog, createBlog, updateBlog , deleteById
+}
+
