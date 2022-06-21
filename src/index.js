@@ -14,10 +14,6 @@ mongoose.connect("mongodb+srv://vishal221:QbG4QZXzT3SrfBAF@cluster0.jegkx.mongod
    { useNewUrlParser:true })
 
 
-mongoose.connect("", {
-    useNewUrlParser: true
-})
-
 .then( () => console.log("MongoDb is connected"))
 .catch ( err => console.log(err) )
 

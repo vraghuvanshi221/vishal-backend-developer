@@ -82,9 +82,6 @@ const updateBlog = async function (req, res) {
 
 // delete blog by id
 
-const blogModel = require("../Model/blogModel")
-
-
 let deleteBlogs = async(req, res) => {
     try{
         let blogId = req.params.blogId;
