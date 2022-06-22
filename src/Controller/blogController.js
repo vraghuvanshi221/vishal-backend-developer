@@ -1,5 +1,6 @@
 
-
+const blogModel = require('../Model/blogModel')
+const authorModel = require('../Model/authorModel')
 const mongoose = require("mongoose")
 const { query } = require('express');
 
@@ -20,7 +21,7 @@ let createBlog = async function (req, res) {
     try {
         let data = req.body;
         let authorId = data.authorId
-        console.log(data)
+  
         if (data.title == undefined) return res.status(400).send({ status: false, msg: "Title tag is required" })
         if (data.body == undefined) return res.status(400).send({ status: false, msg: "body tag is required" })
         if (data.category == undefined) return res.status(400).send({ status: false, msg: "category tag is required" })
@@ -32,7 +33,8 @@ let createBlog = async function (req, res) {
         if (!isValid(data.authorId)) return res.status(400).send({ status: false, msg: " authorId is not empty" })
         if (!mongoose.Types.ObjectId.isValid(authorId)) return res.status(400).send({ status: false, mess: "Please enter a valid id " })
 
-        let isExistsAuthorId = await blogModel.findById(authorId)
+        let isExistsAuthorId = await authorModel.findById(authorId)
+        console.log(isExistsAuthorId)
         if (!isExistsAuthorId) return res.status(400).send({ status: false, msg: "This author id is not present in db" })
 
         let newBlogObject = await blogModel.create(data)
