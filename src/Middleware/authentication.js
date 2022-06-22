@@ -1,65 +1,62 @@
 
 const jwt = require('jsonwebtoken')
+
+
+
+
 const isPresentToken = function (req, res, next) {
-   
-    if (!(req.headers["x-api-key"] || req.headers["x-api-key"])) {
-        console.log("1")
+
+    if (!(req.headers["x-api-key"])) {
         res.send({ status: false, msg: "token must be present" })
     }
     else {
-        console.log("1.1")
+
         next()
     }
 }
 const isVerifyToken = function (req, res, next) {
     let token = req.headers["x-api-key"]
-    let decodedToken = jwt.verify(token, "project1");
 
-    try{
+    try {
+        let decodedToken = jwt.verify(token, "project1");
         if (!decodedToken) {
-            console.log("2")
             res.send({ status: false, msg: "token is invalid" });
-            
         }
         next()
-    }catch(err)
-    { console.log("2.1")
+    } catch (err) {
         res.send({ status: false, msg: "token is invalid" });
 
     }
 
+}
+
+const authorise = function(req, res, next) {
+    try {
+    let token = req.headers["x-api-key"]
+    if(!token) return res.status(400).send({status: false, msg: "token must be present "})
+    let decodedToken = jwt.verify(token, "project1")
+
+    if(!decodedToken) return res.status(403).send({status: false, msg:"token is not valid"})
+    
+    let userToBeModified = req.params.userId
   
+    let userLoggedIn = decodedToken.userId
+
+    if(userToBeModified != userLoggedIn)
+     return res.status(403).send({status: false, msg: 'User logged is not allowed to modify the requested users data'}) 
 }
-
-
-const isloggedInUser = function(req,res,next)
-{
-    let token = req.headers["x-api-key"]
-    let decodedToken = jwt.verify(token, "project1");
-    let userToBeModified = req.params.authorId;
-    let userLoggedIn= decodedToken.authorId
-    if(userToBeModified!=userLoggedIn) return res.send({status:false,msg:"user logedin is not allowed to modify  the request"})
+     catch (err) {
+            console.log("This is the error :", err.message)
+            res.status(500).send({ msg: "Error", error: err.message })
+        }
+  
     next()
+};
 
-}
-const authorModel = require('../Model/authorModel')
-//creation specify person
-const createAuthorization = async function(req,res,next)
-{
-    let token = req.headers["x-api-key"]
-    let decodedToken = jwt.verify(token, "project1");
-    console.log(decodedToken)
-    let userToBeCreated = req.body.authorId
-    console.log(userToBeCreated)
-    let oneUserFullData=await authorModel.findById(userToBeCreated)
-    console.log(oneUserFullData)
-    let myemil = oneUserFullData.email
-    console.log(myemil)
-    let userLoggedIn= decodedToken.authorId
-    console.log(userLoggedIn)
-    if(myemil!=userLoggedIn) return res.send({status:false,msg:"user logedin is not allowed to modify  the request"})
-    next()
 
-}
 
-module.exports={isPresentToken,isVerifyToken,isloggedInUser,createAuthorization}
+
+
+
+
+module.exports = { isPresentToken, isVerifyToken }

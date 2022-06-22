@@ -16,13 +16,8 @@ router.post('/blogs',  blogController.createBlog)
 // authentication.isPresentToken, authentication.isVerifyToken, authentication.isloggedInUser,
 router.delete("/delete/:blogId",  blogController.deleteById)
 
-// working perfect ===> tags prob is hereauthentication.isPresentToken, authentication.isVerifyToken, authentication.isloggedInUser,
 router.get('/blogs',  blogController.getBlogs)
 
-//update // put 
-router.put("/blogs/:blogId", blogController.updateBlog)
-
-// delete query params
 router.delete('/blogs', blogController.deleteBlog)
 
 

@@ -1,4 +1,5 @@
 
+
 const  mongoose = require("mongoose")
 let blogModel= require("../Model/blogModel")
 const { query } = require('express');
@@ -68,10 +69,14 @@ const getBlogs = async function (req, res) {
 
 
 
-// updated by params
+
+
+
+  
 const updateBlog = async function (req, res) {
     try {
         let blogId = req.params.blogId
+       
 
         let blog = await blogModel.findById(blogId);
 
@@ -118,7 +123,6 @@ const deleteById = async function (req, res) {
 
 
 
-// delete using query params 
 const deleteBlog = async function (req, res) {
     try {
         let queryData = req.query
@@ -174,6 +178,8 @@ const deleteBlog = async function (req, res) {
 
 };
 
+
+  
 
 
 module.exports = {
