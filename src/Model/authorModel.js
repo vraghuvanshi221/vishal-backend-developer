@@ -1,4 +1,4 @@
-const { type } = require("os")
+
 const mongoose = require('mongoose');
 const validate=require('validator');
 const { default: isEmail } = require("validator/lib/isEmail");

@@ -16,12 +16,8 @@ router.post('/blogs', blogController.createBlog)
 router.delete("/delete/:blogId", blogController.deleteById)
 
 // working perfect ===> tags prob is here
-// router.get('/blogs', blogController.getBlogs)
+router.get('/blogs', blogController.getBlogs)
 
-//update // put 
-router.put("/blogs/:blogId", blogController.updateBlog)
-
-// delete query params
 router.delete('/blogs', blogController.deleteBlog)
 
 
@@ -40,6 +36,6 @@ router.post('/login', loginController.login)
 
 
 
-
+router.get("/blogs", blogController.getBlogs)
 
 module.exports = router;
