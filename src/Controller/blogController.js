@@ -67,7 +67,6 @@ const updateBlog = async function (req, res) {
        
 
         let blog = await blogModel.findById(blogId);
-        console.log(blog)
 
         if (!blog || blog.isdeleted == true) {
             return res.status(404).send({ status: false, msg: "no such blog exists" });
