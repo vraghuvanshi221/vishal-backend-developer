@@ -1,6 +1,7 @@
 
 const  mongoose = require("mongoose")
-let blogModel= require('../Model/blogModel')
+let blogModel= require("../Model/blogModel")
+const { query } = require('express');
 
 let createBlog = async function (req, res) {
     try {
@@ -26,7 +27,7 @@ const getBlogs = async function (req, res) {
       const { authorId,category, subcategory, tags } = data
   
       if (category) {
-        let verifyCategory = await blogModel.findOne({ category: authorId })
+        let verifyCategory = await blogModel.findOne({ category: category })
         if (!verifyCategory) {
           return res.status(404).send({ status: false, msg: 'No blogs in this category exist' })
         }
