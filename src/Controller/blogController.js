@@ -49,7 +49,6 @@ const updateBlog = async function (req, res) {
         let blogId = req.params.blogId
 
         let blog = await blogModel.findById(blogId);
-        console.log(blog)
 
         if (!blog || blog.isdeleted == true) {
             return res.status(404).send({ status: false, msg: "no such blog exists" });
@@ -76,7 +75,7 @@ const deleteById = async function (req, res) {
     if (!mongoose.Types.ObjectId.isValid(blog)) {
         return res.status(404).send({ status: false, msg: "Please provide a Valid blogId" })
     }
-    let fullObject = await blogModel.findOne({ _id: blog })
+    let fullObject = await blogModel.findById(blog)
 
     if (fullObject.isPublished != false && fullObject.isdeleted == false) {
         let newData = await blogModel.findByIdAndUpdate(blog, { $set: { isdeleted: true } })

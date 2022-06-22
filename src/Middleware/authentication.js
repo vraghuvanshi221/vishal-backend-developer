@@ -3,9 +3,11 @@ const jwt = require('jsonwebtoken')
 const isPresentToken = function (req, res, next) {
    
     if (!(req.headers["x-api-key"] || req.headers["x-api-key"])) {
+        console.log("1")
         res.send({ status: false, msg: "token must be present" })
     }
     else {
+        console.log("1.1")
         next()
     }
 }
@@ -15,12 +17,15 @@ const isVerifyToken = function (req, res, next) {
 
     try{
         if (!decodedToken) {
+            console.log("2")
             res.send({ status: false, msg: "token is invalid" });
+            
         }
         next()
     }catch(err)
-    {
+    { console.log("2.1")
         res.send({ status: false, msg: "token is invalid" });
+
     }
 
   
