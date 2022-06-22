@@ -19,8 +19,8 @@ const login = async function(req,res)
 
     let token = jwt.sign(
         {
-          authorId: user.email,
-          batch: "radon",
+          authorId: user._id.toString()
+        
         },
         "project1"
       );

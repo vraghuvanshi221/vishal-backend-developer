@@ -3,6 +3,15 @@ const  mongoose = require("mongoose")
 let blogModel= require("../Model/blogModel")
 const { query } = require('express');
 
+const isValid = function (value) {
+    if (typeof value === 'undefined' || value === null) return false
+    if (typeof value === 'string' && value.trim().length === 0) return false
+    return true;
+}
+
+const isValidRequestBody = function(requestBody){
+    return Object.keys(requestBody)
+}
 let createBlog = async function (req, res) {
     try {
         let data = req.body;
@@ -16,33 +25,49 @@ let createBlog = async function (req, res) {
 // get by query
 const getBlogs = async function (req, res) {
     try {
+      let query = req.query;
       let filter = {
         isdeleted: false,
         isPublished: true,
-      ...data
+        ...query
       };
- 
-      const { authorId,category, subcategory, tags } = data
+   if(isValidRequestBody(query)){
+      const { authorId,category, subcategory, tags } = query
   
-      if (category) {
-        let verifyCategory = await blogModel.findOne({ category: category })
-        if (!verifyCategory) {
-          return res.status(404).send({ status: false, msg: 'No blogs in this category exist' })
-        }
+      if (isValid(category)) {
+        filter['category']= category.trim()
+      
       }
-      if (authorId) {
-        let verifyCategory = await blogModel.findOne({ authorId: authorId })
-        if (!verifyCategory) {
-            return res.status(404).send({ status: false, msg: 'author id is not exists' })
-        }
-        let blogData = req.body;
-        let updateBlog = await blogModel.findOneAndUpdate({ _id: blogId }, blogData);
-        return res.status(200).send({ status: true, data: updateBlog });
+      if (isValid(authorId)){
+        filter['authorId']= authorId
+      }
+  
+      if (isValid(tags) ){
+          const tagsArr = tags.trim().split(',').map(tag => tag.trim());
+          filter['tags'] ={$all :tagsArr}
+      }
+      if (isValid(subcategory)) {
+        const subcatArr = subcategory.trim().split(',').map(subcat => subcat.trim());
+        filter['subcategory'] ={$all : subcatArr}
+      }
+    } 
+      
+      let getSpecificBlogs = await blogModel.find(filter);
+  
+      if (getSpecificBlogs.length == 0) {
+        return res.status(400).send({ status: false, data: "No blogs can be found" });
+      } 
+      else {
+        return res.status(200).send({ status: true, data: getSpecificBlogs });
+      }
     }
-} catch (err) {
-        return res.status(500).send({ status: false, msg: "Internal Server Error" })
+      catch (error) {
+      res.status(500).send({ status: false, err: error.message });
     }
-};
+}
+
+
+
 // updated by params
 const updateBlog = async function (req, res) {
     try {
