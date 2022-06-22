@@ -82,30 +82,34 @@ const updateBlog = async function (req, res) {
 
 // delete blog by id
 
-let deleteBlogs = async(req, res) => {
-    try{
-        let blogId = req.params.blogId;
-
-    let blog = await blogModel.findById(blogId);
-      
-       if(!blog){
-     return  res.status(404).send({status:false ,msg: "id is not found" })
-       }
-
-       if(blog.isdeleted === true){
-        return  res.status(404).send({status:false ,msg: "blog  is already deleted" })
-       }
-       let deleteBlog = await blogModel.findByIdAndUpdate({_id:blogId},{isdeleted : true})
-       res.status(200).send()
-    }catch(error){
-        console.log(err)
-        res.status(500).send({status:false, msg: err.message})
-    }
+const deleteById = async function (req, res) {
+    
+  let blog = req.params.blogId
+  console.log(blog)
+  
+  if(!blog){
+      return res.status(400).send({status : false, msg : "blogId must be present in order to delete it"})
+  }
+     
+  if(!mongoose.Types.ObjectId.isValid(blog)){
+      return res.status(404).send({status: false, msg: "Please provide a Valid blogId"})
+  }
+  let fullObject = await blogModel.findOne({_id:blog})
+  
+  if(fullObject.isPublished != false && fullObject.isdeleted==false) 
+  {
+      let newData = await blogModel.findByIdAndUpdate(blog , {$set:{isdeleted:true}})
+      res.status(200).send()
+  }
+  else
+  {
+      res.status(400).send({status:false,msg:"This data is not publised "})
+  }  
 };
 
 
 const deleteBlog = async function (req, res) {
-    let blogId = req.query.queryParams
+    let blogId = req.query
     let blog = await blogModel.findById(blogId);
     if (!blog)
         res.status(404).send({ status: false, msg: "Data doesn't exits" })
@@ -115,8 +119,8 @@ const deleteBlog = async function (req, res) {
 module.exports.getBlogs =getBlogs
 module.exports.updateBlog = updateBlog;
 module.exports.deleteBlog = deleteBlog;
-module.exports.deleteBlogs = deleteBlogs
-module.exports.createBlog = createBlog
+module.exports.createBlog = createBlog;
+module.exports.deleteById=deleteById;
 //const blogModel = require("../Model/blogModel")
 
 
