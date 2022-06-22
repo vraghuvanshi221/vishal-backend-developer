@@ -17,6 +17,7 @@ let createBlog = async function (req, res) {
 const getBlogs = async function (req, res) {
     try {
         let data = req.query;
+
         let filter = {
             isdeleted: false,
             isPublished: true,
@@ -24,7 +25,7 @@ const getBlogs = async function (req, res) {
         };
         const { authorId, category, subcategory, tags } = data
         if (category) {
-            let verifyCategory = await blogModel.findOne({ category: category })
+            let verifyCategory = await blogModel.findOne({ category: category }) 
             if (!verifyCategory) {
                 return res.status(404).send({ status: false, msg: 'No blogs in this category exist' })
             }
@@ -70,7 +71,6 @@ const updateBlog = async function (req, res) {
         let blogId = req.params.blogId
 
         let blog = await blogModel.findById(blogId);
-        console.log(blog)
 
         if (!blog || blog.isdeleted == true) {
             return res.status(404).send({ status: false, msg: "no such blog exists" });
@@ -98,14 +98,14 @@ const deleteById = async function (req, res) {
     if (!mongoose.Types.ObjectId.isValid(blog)) {
         return res.status(404).send({ status: false, msg: "Please provide a Valid blogId" })
     }
-    let fullObject = await blogModel.findOne({ _id: blog })
+    let fullObject = await blogModel.findById(blog)
 
     if (fullObject.isPublished != false && fullObject.isdeleted == false) {
         let newData = await blogModel.findByIdAndUpdate(blog, { $set: { isdeleted: true } })
         res.status(200).send()
     }
     else {
-        res.status(400).send({ status: false, msg: "This data is not publised " })
+        res.status(400).send({ status: false, msg: "This blog is not Available" })
     }
 }
 
