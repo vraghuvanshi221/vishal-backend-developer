@@ -11,13 +11,13 @@ const router = express.Router();
 router.post('/authors', authorController.createAuthor) 
 
 // Blog API's yaha create krte time author id to dege hi denge ---> ab authorId se jayege hum emailId pr using populate
-router.post('/blogs', authentication.isPresentToken, authentication.isVerifyToken, authentication.createAuthorization, blogMiddleware.isAuthorIdValid, blogController.createBlog)
+router.post('/blogs', authentication.isPresentToken,authentication.isVerifyToken, blogMiddleware.isAuthorIdValid, blogController.createBlog)
 // working perfect 
 // authentication.isPresentToken, authentication.isVerifyToken, authentication.isloggedInUser,
 router.delete("/delete/:blogId",  blogController.deleteById)
 
 // working perfect ===> tags prob is here
-router.get('/blogs', authentication.isPresentToken, authentication.isVerifyToken, authentication.isloggedInUser, blogController.getBlogs)
+router.get('/blogs', blogController.getBlogs)
 
 //update // put 
 router.put("/blogs/:blogId", blogController.updateBlog)
