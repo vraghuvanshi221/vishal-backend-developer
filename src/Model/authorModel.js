@@ -4,11 +4,11 @@ const validate=require('validator');
 const { default: isEmail } = require("validator/lib/isEmail");
 
 const authorSchema = new mongoose.Schema({
- fName: {
+ fname: {
     type:String,
      required:true},
 
- lName: {
+ lname: {
     type:String,
     required:true
  },
