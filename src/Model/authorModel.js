@@ -6,29 +6,29 @@ const { default: isEmail } = require("validator/lib/isEmail");
 const authorSchema = new mongoose.Schema({
  fName: {
     type:String,
-     require:true},
+     required:true},
 
  lName: {
     type:String,
-    require:true
+    required:true
  },
 
  title: {
     type:String,
-    require:true,
+    required:true,
      enum:["Mr", "Mrs", "Miss"]
    },
 
  email: {
     type:String,
-   require:true,
-    validate:[isEmail,'invalid email'],
+   required:true,
     unique:true,
 },
 
  password:{
     type:String,
-    require:true
+    required:true
+    
  }
 },{timestamps: true})
 

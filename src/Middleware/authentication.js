@@ -12,7 +12,6 @@ const isPresentToken = function (req, res, next) {
 }
 const isVerifyToken = function (req, res, next) {
     let token = req.headers["x-api-key"]
-
     try {
         let decodedToken = jwt.verify(token, "project1");
         if (!decodedToken) {
@@ -26,6 +25,23 @@ const isVerifyToken = function (req, res, next) {
 
 }
 
+let isLoggedinAuthor = function(req,res,next)
+{
+    let token = req.headers["x-api-key"]
+    let decodedToken = jwt.verify(token, "project1");
+    let authorId= req.body.authorId
+    if(authorId==decodedToken.authorId)
+    {
+        next()
+    }
+    else
+    {
+        res.status(403).send({status:true,msg:"you are not Authorise"})
+    }
+
+    
+    
+}
 
 
 
@@ -34,4 +50,5 @@ const isVerifyToken = function (req, res, next) {
 
 
 
-module.exports = { isPresentToken, isVerifyToken }
+
+module.exports = { isPresentToken, isVerifyToken, isLoggedinAuthor}

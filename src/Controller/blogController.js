@@ -3,9 +3,32 @@ let blogModel = require('../Model/blogModel')
 const mongoose = require("mongoose");
 const { query } = require('express');
 
+
+const isValid = function (value) {
+    if (typeof value === 'undefined' || value === null) return false
+    if (typeof value === 'string' && value.trim().length === 0) return false
+    return true;
+}
+
+
+// title body ,category author id
+
 let createBlog = async function (req, res) {
     try {
         let data = req.body;
+        let authorId = data.authorId
+        console.log(data)
+        if(data.title == undefined)  return res.status(400).send({status:false,msg:"Title tag is required"})
+        if(data.body == undefined)  return res.status(400).send({status:false,msg:"body tag is required"})
+        if(data.category == undefined)  return res.status(400).send({status:false,msg:"category tag is required"})
+        if(data.authorId == undefined)  return res.status(400).send({status:false,msg:"authorId tag is required"})
+  
+        if(!isValid(data.title)) return res.status(400).send({status:false, msg:"title is not empty"})
+        if(!isValid(data.body)) return res.status(400).send({status:false, msg:"body is not empty"})
+        if(!isValid(data.category)) return res.status(400).send({status:false, msg:"category is not empty"})
+        if(!isValid(data.authorId)) return res.status(400).send({status:false, msg:" authorId is not empty"})
+        if(!mongoose.Types.ObjectId.isValid(authorId)) return res.status(400).send({status:false, mess:"Please enter a valid id "})
+
         let newBlogObject = await blogModel.create(data)
         res.status(201).send({ status: true, data: newBlogObject })
     } catch (err) {
@@ -17,6 +40,7 @@ let createBlog = async function (req, res) {
 const getBlogs = async function (req, res) {
     try {
         let data = req.query;
+        console.log(data.tags)
 
         let filter = {
             isdeleted: false,
@@ -75,7 +99,12 @@ const updateBlog = async function (req, res) {
         if (!blog || blog.isdeleted == true) {
             return res.status(404).send({ status: false, msg: "no such blog exists" });
         };
+
         let blogData = req.body;
+        if(blogData.title)
+        {
+            
+        }
         let updateBlog = await blogModel.findOneAndUpdate({ _id: blogId }, blogData);
         return res.status(200).send({ status: true, data: updateBlog });
     }
@@ -83,6 +112,7 @@ const updateBlog = async function (req, res) {
         return res.status(500).send({ status: false, msg: "Internal Server Error" })
     }
 };
+
 
 
 

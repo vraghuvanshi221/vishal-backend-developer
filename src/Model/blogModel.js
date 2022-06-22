@@ -1,6 +1,8 @@
 const mongoose = require("mongoose")
 const objectId = mongoose.Schema.Types.ObjectId
 //ref and populate
+
+
 const blogSchema = new mongoose.Schema({
     title : {
         type : String,
@@ -27,13 +29,12 @@ const blogSchema = new mongoose.Schema({
     deletedAt : {
         type : Date
     },
-    isdeleted :{
+    isDeleted :{
         type : Boolean,
         default : false
     },
     publishedAt :{
         type :Date,
-        default:new Date()
     }, 
     isPublished : {
         type : Boolean,
