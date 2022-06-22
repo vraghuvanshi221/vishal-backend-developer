@@ -14,7 +14,7 @@ let isAuthorIdValid = async function(req,res,next)
         if(!authorId) return res.status(400).send({status:false, mess:"author id is mandatory"})
         if(!mongoose.Types.ObjectId.isValid(authorId)) return res.status(400).send({status:false, mess:"Please enter a valid id "})
         let isIdAvailable= await authorModel.findById(authorId);
-        if(!isIdAvailable) return res.status(400).send({status:false, msg:"Please enter a valid id"})
+        // if(!isIdAvailable) return res.status(400).send({status:false, msg:"Please enter a valid id"})
         next();
        
     }catch(err)
