@@ -11,7 +11,7 @@ const router = express.Router();
 router.post('/authors', authorController.createAuthor) 
 
 // Blog API's yaha create krte time author id to dege hi denge ---> ab authorId se jayege hum emailId pr using populate
-router.post('/blogs', authentication.isPresentToken,authentication.isVerifyToken, blogMiddleware.isAuthorIdValid, blogController.createBlog)
+router.post('/blogs', blogController.createBlog)
 // working perfect 
 // authentication.isPresentToken, authentication.isVerifyToken, authentication.isloggedInUser,
 router.delete("/delete/:blogId",  blogController.deleteById)

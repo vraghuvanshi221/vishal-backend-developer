@@ -72,7 +72,7 @@ const updateBlog = async function (req, res) {
             return res.status(404).send({ status: false, msg: "no such blog exists" });
         };
         let blogData = req.body;
-        let updateBlog = await blogModel.findOneAndUpdate({ _id: blogId }, blogData);
+        let updateBlog = await blogModel.findOneAndUpdate({ _id: blogId }, {isPublished:true}).findOneAndUpdate({ _id: blogId }, blogData);
         return res.status(200).send({ status: true, data: updateBlog });
     }
     catch (err) {
