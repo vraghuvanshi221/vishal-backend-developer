@@ -229,9 +229,19 @@ const deleteBlog = async function (req, res) {
             ...query
         };
 
+        if (queryAuthorId) {
+            if (!mongoose.Types.ObjectId.isValid(queryAuthorId)) {
+                return res.status(400).send({ status: false, msg: "Please provide a Valid AuthorId" })
+            }
+        }
+        if(!queryAuthorId) return res.status(400).send({status:false,msg:"authorId field should not be empty"})
+        if (req.query.tags == '') return res.status(400).send({ status: false, msg: "Tags field should not be empty" })
+        if (req.query.subcategory == '') return res.status(400).send({ status: false, msg: "Subcategory field should not be empty" })
+        if (req.query.category == '') return res.status(400).send({ status: false, msg: "category field should not be empty" })
+
         if (filter.blogId) return res.status(400).send({ status: false, msg: "can't find by blogId" })
         if (queryAuthorId) {
-            if (queryAuthorId != decodedToken.authorId) return res.status(403).send({ status: false, msg: `you are not Authorise to access data by using this authorId: ${queryAuthorId}` })
+            if (queryAuthorId != authorTokenId) return res.status(403).send({ status: false, msg: `you are not Authorise to access data by using this authorId: ${queryAuthorId}` })
         }
         if (isValidRequestBody(query)) {
             const { authorId, category, subcategory, tags } = query
@@ -243,6 +253,7 @@ const deleteBlog = async function (req, res) {
 
             }
             if (isValid(authorId)) {
+                // const idArr = authorId.trim().split(',').map(authorId => authorId.trim());
                 filter['authorId'] = authorId
             }
 
