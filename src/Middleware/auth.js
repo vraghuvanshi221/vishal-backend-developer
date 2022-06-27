@@ -24,8 +24,4 @@ const isVerifyToken = function (req, res, next) {
 
 //================================================ ** Exprots all modules here ** ===================================================
 
-<<<<<<< HEAD
-module.exports = { authorise, isVerifyToken }
-=======
 module.exports = { isVerifyToken }
->>>>>>> 45c7b45f6b62c99ae5c589ec12f304a07bd5d950
