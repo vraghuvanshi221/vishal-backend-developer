@@ -74,7 +74,7 @@ const getBlogs = async function (req, res) {
     try {
         let query = req.query;
         let filter = {
-            isdeleted: false,
+            isDeleted: false,
             isPublished: true,
             ...query
         };
@@ -212,8 +212,8 @@ const deleteById = async function (req, res) {
 
 
     if (fullObject.isPublished != false && fullObject.isDeleted == false) {
-        let newData = await blogModel.updateOne({ _id: blog }, { $set: { "isDeleted": true } })
-        res.status(200).send()
+        let newData = await blogModel.updateOne({ _id: blog }, { $set: { "isDeleted": true,"deletedAt":new Date } })
+        res.status(200).send({status:true,msg:"Sucessfully Deleted"})
     }
 
     else {
@@ -233,14 +233,15 @@ const deleteBlog = async function (req, res) {
 
         let query = req.query;
         let filter = {
-            isdeleted: false,
+            isDeleted: false,
             isPublished: false,
             authorId: authorTokenId,
 
             ...query
         };
 
-
+        // if(!filter.query)return res.status(400).send({status:false,msg:"No such blog available for Deletion"})
+        
         let totalKey = Object.keys(req.query)
         if (totalKey.length == 0) return res.status(400).send({ status: false, msg: "Please provide a some query for Proper responce" })
         if (req.query.body || req.query.body == '') return res.status(400).send({ status: false, msg: "You can not delete document by using body" })
@@ -272,6 +273,8 @@ const deleteBlog = async function (req, res) {
         if (queryAuthorId) {
             if (queryAuthorId != authorTokenId) return res.status(403).send({ status: false, msg: `you are not Authorise to access data by using this authorId: ${queryAuthorId}` })
         }
+       
+
         if (isValidRequestBody(query)) {
             const { authorId, category, subcategory, tags } = query
 
@@ -299,7 +302,7 @@ const deleteBlog = async function (req, res) {
         }
 
 
-        let deletedData = await blogModel.updateMany(filter, { $set: { isDeleted: true } }).count()
+        let deletedData = await blogModel.updateMany(filter,  { $set: { "isDeleted": true,"deletedAt":new Date } }).count()
 
 
         res.status(200).send({ status: true, delete: `Total ${deletedData} items deleted` });
