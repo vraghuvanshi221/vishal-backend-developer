@@ -54,7 +54,7 @@ const getdetails = async function (req, res) {
       let getInternDetails = await internModel.find({ collegeId: cljId }).select({ name: 1, email: 1, mobile: 1 })
       if (getInternDetails.length==0) return res.status(404).send({ status: false,msg: "Sorry!!!! This College Exists But No Interns Found"})
 
-      getCollegedetails.interns=getInternDetails
+      getCollegedetails.interns=getInternDetails  
       delete getCollegedetails._id
       delete getCollegedetails.isDeleted
      
