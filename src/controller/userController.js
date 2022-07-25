@@ -315,4 +315,4 @@ const updateUserDetails = async (req, res) => {
 
 
 
-module.exports = { userLogin, getUser, updateUserDetails }
+module.exports = {registerUser, userLogin, getUser, updateUserDetails }
