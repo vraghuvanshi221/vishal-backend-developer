@@ -5,9 +5,7 @@ const userController = require('../controller/userController')
 
 
 
-router.get('/test-me',function (req, res){
-    res.send({Message: "test api"})
-})
+//router.get('/test-me',userController.test)
 
 
 module.exports=router
