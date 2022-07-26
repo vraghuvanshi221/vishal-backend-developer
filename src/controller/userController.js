@@ -18,6 +18,7 @@ const registerUser = async function (req, res) {
 
         let address = req.body.address
         let { shipping, billing } = address
+        
         if (!isValidRequest(userDetails)) {
             return res.status(400).send({ status: false, msg: "Please enter details for user registration." })
         }
