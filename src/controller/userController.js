@@ -60,9 +60,17 @@ const registerUser = async function (req, res) {
         if (!isValidPassword(password)) {
             return res.status(400).send({ status: false, msg: "Please enter a password which contains min 8 and maximum 15 letters,upper and lower case letters and a number" })
         }
+        if(address && typeof(address)=={})
         if (!address) {
             return res.status(400).send({ status: false, msg: "Please enter address for shippin and billing purpose." })
         }
+        if(!isValid(shipping.street))return res.status(400).send({status:false,msg:"please enter valid shipping street information"});
+        if(!isValid(shipping.city))return res.status(400).send({status:false,msg:"please enter valid shipping city information"});
+        if(!isValid(shipping.pincode))return res.status(400).send({status:false,msg:"please enter valid shipping pincode information"});
+        if(!isValid(billing.street))return res.status(400).send({status:false,msg:"please enter valid billing street information"});
+        if(!isValid(billing.city))return res.status(400).send({status:false,msg:"please enter valid billing city information"});
+        if(!isValid (billing.pincode))return res.status(400).send({status:false,msg:"please enter valid billing pincode information"});
+        
         let profileImage = uploadedFileURL
         let responseBody = { fname, lname, email, profileImage, phone, password, address }
         let createUser = await userModel.create(responseBody)
@@ -71,7 +79,10 @@ const registerUser = async function (req, res) {
     catch (err) {
         res.status(500).send({ status: false, msg: err.message })
     }
-}
+};
+
+
+//-----------------------------------------------------user login-----------------------------------------------------------------------//
 
 
 const userLogin = async function (req, res) {
@@ -136,7 +147,7 @@ const getUser = async function (req, res) {
     catch (err) {
         res.status(500).send({ status: false, message: err.message })
     }
-}
+};
 
 
 
