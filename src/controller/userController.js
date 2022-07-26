@@ -317,13 +317,8 @@ const updateUserDetails = async (req, res) => {
         console.log(err)
         return res.status(500).send({ status: false, error: err.message })
     }
-}
-
-
-
-
-
-
-
+};
 
 module.exports = {registerUser, userLogin, getUser, updateUserDetails }
+
+
