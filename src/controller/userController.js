@@ -181,6 +181,9 @@ const userLogin = async function (req, res) {
 const getUser = async function (req, res) {
     try {
         let userId = req.params.userId
+        if(!isValidObjectId(userId)){
+            return res.status(400).send({ status: false, message: "Invalid object id"})   
+        }
         //-------------------------------------checking Authorizaton------------------------->>
         if (req.loginId != userId) {
             return res.status(403).send({ status: false, message: "User logged is not allowed to view the profile details" })
@@ -227,7 +230,8 @@ const updateUserDetails = async (req, res) => {
         let { fname, lname, email, phone, password, profileImage } = data
 
         let obj = {}
-
+        //let street=address.shipping.street
+//let {shipping,billing}=address
         if (fname) {
             if (!validName(fname)) {
                 return res.status(400).send({ status: false, message: "first name is not in right format" })
@@ -280,6 +284,8 @@ const updateUserDetails = async (req, res) => {
 
         }
 
+        
+        console.log(address.shipping.street)
         if (address) {
 
             if (address.shipping) {
