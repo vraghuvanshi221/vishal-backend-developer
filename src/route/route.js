@@ -13,5 +13,15 @@ router.post("/login", userLogin)
 router.get("/user/:userId/profile",authentication, getUser )
 router.put("/user/:userId/profile",authentication, updateUserDetails)
 
+// ******************************* PRODUCT APIS **********************************
+
 router.post("/products",createProduct)
+router.get("/products/:productId", getProductsById)
+router.delete("/products/:productId", deleteProductById)
+
+
+
+
+
+
 module.exports=router
