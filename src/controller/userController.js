@@ -2,12 +2,10 @@ const userModel = require("../models/userModel")
 const jwt=require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const { uploadFile } = require("../AWS/aws")
-const { isValid, isValidMail, isValidMobile, isValidRequest, isValidPassword,
-    isValidStreet, isValidCity, isValidPin } = require("../validator/validation")
+const {isValid, validName, isValidMail,isValidRequest,isValidMobile,
+     isValidPassword, isValidStreet, isValidCity, isValidPin,isValidObjectId,removeExtraSpace } = require("../validator/validation")
 
-const streetRegex = /^([a-zA-Z0-9 ]{2,50})*$/
-const cityRegex = /^[a-zA-z]+([\s][a-zA-Z]+)*$/
-const pincodeRegex = /^\d{6}$/
+
 
 
 const registerUser = async function (req, res) {
@@ -153,10 +151,15 @@ const userLogin = async function (req, res) {
 const getUser = async function (req, res) {
     try {
         let userId = req.params.userId
+        if(!isValidObjectId(userId)){
+            return res.status(400).send({ status: false, message: "Invalid object id"})   
+        }
         //-------------------------------------checking Authorizaton------------------------->>
         if(req.loginId!=userId){
             return res.status(403).send({ status: false, message: "User logged is not allowed to view the profile details" })
         }
+
+       
         let userDetails=await userModel.findById(userId)
         if(!userDetails){
            return res.status(404).send({ status: false, message: "User not found"})
@@ -186,7 +189,7 @@ const updateUserDetails = async (req, res) => {
         let file = req.files
         let address = data.address
         let { shipping, billing } = address
-        // validate body 
+       
         if (!isValidRequest(data)) {
             return res.status(400).send({ status: false, message: "Invalid Request" })
         }
@@ -260,9 +263,9 @@ const updateUserDetails = async (req, res) => {
         
         console.log(address.shipping.street)
         if (address) {
-            obj.address={}
+           
             if (address.shipping) {
-                obj.address.shipping={}
+               
 
                 if (address.shipping.street) {
                     if (!isValidStreet(address.shipping.street)) {
@@ -271,7 +274,7 @@ const updateUserDetails = async (req, res) => {
                         });
                     }
                     console.log(shipping.street)
-                    obj.address.shipping.street = address.shipping.street
+                    obj["address.shipping.street"] = address.shipping.street
                    
 
                 }
@@ -292,12 +295,12 @@ const updateUserDetails = async (req, res) => {
                             status: false, message: "Pincode should have only 6 digits and only number",
                         });
                     }
-                    obj.address.shipping.pincode = address.shipping.pincode
+                    obj["address.shipping.pincode"] = address.shipping.pincode
                 }
             }
 
             if (address.billing) {
-                obj.address.billing={}
+                
 
                 if (address.billing.street) {
                     if (!isValidStreet(address.billing.street)) {
@@ -306,7 +309,7 @@ const updateUserDetails = async (req, res) => {
                         });
                     }
 
-                    obj.address.billing.street = address.billing.street
+                    obj["address.billing.street"] = address.billing.street
                 }
 
                 if (address.billing.city) {
@@ -315,7 +318,7 @@ const updateUserDetails = async (req, res) => {
                             status: false, message: "City name invalid. It can contain only alphabete."
                         });
                     }
-                    obj.address.billing.city = address.billing.city
+                    obj["address.billing.city"] = address.billing.city
 
                 }
 
@@ -325,7 +328,7 @@ const updateUserDetails = async (req, res) => {
                             status: false, message: "Pincode should have only 6 digits and only numerical elements.",
                         });
                     }
-                    obj.address.billing.pincode = address.billing.pincode
+                    obj["address.billing.pincode"] = address.billing.pincode
                 }
             }
         }
