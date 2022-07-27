@@ -55,7 +55,9 @@ const registerUser = async function (req, res) {
         }
         if (!isValidPassword(password)) {
             return res.status(400).send({ status: false, msg: "Please enter a password which contains min 8 and maximum 15 letters,upper and lower case letters and a number" })}
-    
+            const salt = await bcrypt.genSalt(10)
+            const newPassword = await bcrypt.hash(password, salt)
+            password = newPassword
 
     
 
@@ -66,11 +68,16 @@ const registerUser = async function (req, res) {
         if(!isValid(shipping.street))return res.status(400).send({status:false,msg:"please enter valid shipping street information"});
         if(!isValid(shipping.city))return res.status(400).send({status:false,msg:"please enter valid shipping city information"});
         if(!isValid(shipping.pincode))return res.status(400).send({status:false,msg:"please enter valid shipping pincode information"});
+        if (!pincodeRegex.test(address.shipping.pincode)) return res.status(400).send({
+                status: false, message: "please enter valid pan India pincode in shipping address"});
         if(!isValid(billing.street))return res.status(400).send({status:false,msg:"please enter valid billing street information"});
         if(!isValid(billing.city))return res.status(400).send({status:false,msg:"please enter valid billing city information"});
         if(!isValid (billing.pincode))return res.status(400).send({status:false,msg:"please enter valid billing pincode information"});
+        if (!pincodeRegex.test(address.billing.pincode)) return res.status(400).send({
+            status: false, message: "please enter valid pan India pincode in billing address "});
         
         let profileImage = uploadedFileURL
+        if(!profileImage)return res.status(400).send({status:false,msg:"don't leave upload files attribute, upload valid files"});
         let responseBody = { fname, lname, email, profileImage, phone, password, address }
         let createUser = await userModel.create(responseBody)
         return res.status(201).send({ status: true,message:"User created successfully ",data: createUser })
@@ -334,13 +341,8 @@ const updateUserDetails = async (req, res) => {
         console.log(err)
         return res.status(500).send({ status: false, error: err.message })
     }
-}
-
-
-
-
-
-
-
+};
 
 module.exports = {registerUser, userLogin, getUser, updateUserDetails }
+
+
