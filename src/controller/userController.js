@@ -1,14 +1,10 @@
 const userModel = require("../models/userModel")
 const bcrypt = require("bcrypt")
 const { uploadFile } = require("../AWS/aws")
-const { isValid, isValidMail, isValidMobile, isValidRequest, isValidPassword } = require("../validator/validation")
+const { isValid, validName, isValidMail, isValidMobile, isValidRequest, isValidPassword, isValidStreet, isValidCity, isValidPin } = require("../validator/validation")
 
-// Regex. Remove this if function is build in validation file. 
 
-const streetRegex = /^([a-zA-Z0-9 ]{2,50})*$/
-const cityRegex = /^[a-zA-z]+([\s][a-zA-Z]+)*$/
-const pincodeRegex = /^\d{6}$/
-
+//==============================================register user==============================================//
 
 const registerUser = async function (req, res) {
     try {
@@ -18,17 +14,23 @@ const registerUser = async function (req, res) {
 
         let address = req.body.address
         let { shipping, billing } = address
-        
+
         if (!isValidRequest(userDetails)) {
             return res.status(400).send({ status: false, msg: "Please enter details for user registration." })
         }
-        if (!fname) {
+        if (!isValid(fname)) {
             return res.status(400).send({ status: false, msg: "Please enter fname for registration." })
         }
-        if (!lname) {
+        if(!validName(fname)){
+            return res.status(400).send({status: false, msg: `${fname} is not a valid fname.`})
+        }
+        if (!isValid(lname)) {
             return res.status(400).send({ status: false, msg: "Please enter lname for registration." })
         }
-        if (!email) {
+        if(!validName(lname)){
+            return res.status(400).send({status: false, msg: `${lname} is not a valid lname.`})
+        }
+        if (!isValid(email)) {
             return res.status(400).send({ status: false, msg: "Please enter email for registration." })
         }
         if (!isValidMail(email)) {
@@ -38,7 +40,7 @@ const registerUser = async function (req, res) {
         if (mailCheck) {
             return res.status(409).send({ status: false, msg: `${email} already registered, try new.` })
         }
-        if (!files) {
+        if (files.length == 0) {
             return res.status(400).send({ status: false, msg: "Please upload profile image for registration." })
         }
         if (files.length > 0) {
@@ -58,19 +60,50 @@ const registerUser = async function (req, res) {
             return res.status(400).send({ status: false, msg: "Please enter a strong password for registration." })
         }
         if (!isValidPassword(password)) {
-            return res.status(400).send({ status: false, msg: "Please enter a password which contains min 8 and maximum 15 letters,upper and lower case letters and a number" })
+            return res.status(400).send({ status: false, msg: "Please enter a password which contains min 8 and maximum 15 letters." })
         }
-        if(address && typeof(address)=={})
-        if (!address) {
-            return res.status(400).send({ status: false, msg: "Please enter address for shippin and billing purpose." })
+        if (password) {
+            const salt = await bcrypt.genSalt(10)
+            const newPassword = await bcrypt.hash(password, salt)
+            password = newPassword
         }
-        if(!isValid(shipping.street))return res.status(400).send({status:false,msg:"please enter valid shipping street information"});
-        if(!isValid(shipping.city))return res.status(400).send({status:false,msg:"please enter valid shipping city information"});
-        if(!isValid(shipping.pincode))return res.status(400).send({status:false,msg:"please enter valid shipping pincode information"});
-        if(!isValid(billing.street))return res.status(400).send({status:false,msg:"please enter valid billing street information"});
-        if(!isValid(billing.city))return res.status(400).send({status:false,msg:"please enter valid billing city information"});
-        if(!isValid (billing.pincode))return res.status(400).send({status:false,msg:"please enter valid billing pincode information"});
-        
+
+        if (address && typeof (address) == {})
+            if (!address) {
+                return res.status(400).send({ status: false, msg: "Please enter address for shipping and billing purpose." })
+            }
+        if (!isValid(shipping.street)) {
+            return res.status(400).send({ status: false, msg: "please enter validshipping street information" });
+        }
+        if (!isValid(shipping.city)) {
+            return res.status(400).send({ status: false, msg: "please enter valid shipping city information" });
+        }
+        if(!isValidCity(shipping.city)){
+            return res.status(400).send({status: false, msg: `${shipping.city} is not a valid city.`})
+        }
+
+        if (!isValid(shipping.pincode)) {
+            return res.status(400).send({ status: false, msg: "please enter pincode for shipping purpose." });
+        }
+        if(!isValidPin(shipping.pincode)){
+            return res.status(400).send({status: false, msg: `${shipping.pincode} is not a valid pincode`})
+        }
+        if (!isValid(billing.street)) {
+            return res.status(400).send({ status: false, msg: "please enter billing street information" });
+        }
+        if (!isValid(billing.city)) {
+            return res.status(400).send({ status: false, msg: "please enter city for billing purpose" });
+        }
+        if(!isValidCity(billing.city)){
+            return res.status(400).send({status: false, msg: `${billing.city} is not a valid city.`})
+        }
+        if (!isValid(billing.pincode)) {
+            return res.status(400).send({ status: false, msg: "please enter pincode for billing purpose." });
+        }
+        if(!isValidPin(billing.pincode)){
+            return res.status(400).send({status: false, msg: `${billing.pincode} is not a valid pincode.`})
+        }
+
         let profileImage = uploadedFileURL
         let responseBody = { fname, lname, email, profileImage, phone, password, address }
         let createUser = await userModel.create(responseBody)
@@ -82,8 +115,7 @@ const registerUser = async function (req, res) {
 };
 
 
-//-----------------------------------------------------user login-----------------------------------------------------------------------//
-
+//================================================userlogin================================================//
 
 const userLogin = async function (req, res) {
     try {
@@ -135,7 +167,7 @@ const userLogin = async function (req, res) {
 
 
 
-// *************************************** API 3 ***************************************
+//=================================================getUser=================================================//
 
 const getUser = async function (req, res) {
     try {
@@ -151,15 +183,17 @@ const getUser = async function (req, res) {
 
 
 
-// **********************************  API 4  **********************************
+//================================================updateUser===============================================//
 
 
 const updateUserDetails = async (req, res) => {
-
     try {
-        let data = req.body
-
         let userId = req.params.userId
+        // if(req.loginId!=userId){
+        //     return res.status(403).send({ status: false, message: "User logged is not allowed to update the profile details" })
+        // }
+
+        let data = req.body
         let file = req.files
 
         // validate body 
@@ -177,28 +211,34 @@ const updateUserDetails = async (req, res) => {
 
         // check authorization 
 
-        let { fname, lname, email, phone, password, address, profileImage } = data
+        let { fname, lname, email, phone, password, profileImage } = data
+        let address = data.address
+        let { shipping, billing } = address
         let obj = {}
 
         if (fname) {
-            // validate fname
+            if (!validName(fname)) {
+                return res.status(400).send({ status: false, message: "first name is not in right format" })
+            }
             obj.fname = fname
         }
 
         if (lname) {
-            // validate lname
+            if (!validName(lname)) {
+                return res.status(400).send({ status: false, message: "Last name is not in right format" })
+            }
             obj.lname = lname
         }
 
         if (email) {
             if (!isValidMail(email)) {
-                return res.status(400).send({ status: false, message: "email is required" })
+                return res.status(400).send({ status: false, message: "Email not in right format" })
             }
 
             const checkEmailFromDb = await userModel.findOne({ email: email })
 
             if (checkEmailFromDb && checkEmailFromDb != null)
-                return res.status(400).send({ status: false, message: "EmailId Exists. Please try another email Id." })
+                return res.status(400).send({ status: false, message: "Email-Id Exists. Please try another email Id." })
             obj.email = email
         }
 
@@ -219,8 +259,8 @@ const updateUserDetails = async (req, res) => {
 
         if (password) {
 
-            if (!(password.length >= 8 && password.length <= 15)) {
-                return res.status(400).send({ status: false, message: "Password should be Valid min 8 and max 15 " })
+            if (!isValidPassword(password)) {
+                return res.status(400).send({ status: false, message: "Password not in right format. Must be in 8 to 15 charactes" })
             }
             const salt = await bcrypt.genSalt(10)
             const newPassword = await bcrypt.hash(password, salt)
@@ -230,67 +270,67 @@ const updateUserDetails = async (req, res) => {
 
         if (address) {
 
-            if (address.shipping) {
+            if (shipping) {
 
-                if (address.shipping.street) {
-                    if (!streetRegex.test(address.shipping.street)) {
+                if (shipping.street) {
+                    if (!isValidStreet(address.shipping.street)) {
                         return res.status(400).send({
-                            status: false, message: "Street should be Valid and Its alphabetic and Number",
+                            status: false, message: "Street name invalid. It can contain alphabete and Number",
                         });
                     }
-                    obj.address.shipping.street = address.shipping.street
+                    obj.address.shipping.street = shipping.street
 
                 }
 
-                if (address.shipping.city) {
-                    if (!cityRegex.test(address.shipping.city)) {
+                if (shipping.city) {
+                    if (!isValidCity(address.shipping.city)) {
                         return res.status(400).send({
-                            status: false, message: "City should be Valid and Its alphabetic",
+                            status: false, message: "City name invalid. It can contain only alphabete"
                         });
                     }
 
-                    obj.address.shipping.city = address.shipping.city
+                    obj.address.shipping.city = shipping.city
                 }
 
-                if (address.shipping.pincode) {
-                    if (!pincodeRegex.test(address.shipping.pincode)) {
+                if (shipping.pincode) {
+                    if (!isValidPin(address.shipping.pincode)) {
                         return res.status(400).send({
-                            status: false, message: "Pincode should have only 6 digits. No alphabets",
+                            status: false, message: "Pincode should have only 6 digits and only number",
                         });
                     }
-                    obj.address.shipping.pincode = address.shipping.pincode
+                    obj.address.shipping.pincode = shipping.pincode
                 }
             }
 
-            if (address.billing) {
+            if (billing) {
 
-                if (address.billing.street) {
-                    if (!cityRegex.test(address.billing.street)) {
+                if (billing.street) {
+                    if (!isValidStreet(address.billing.street)) {
                         return res.status(400).send({
-                            status: false, message: "City should be Valid and Its alphabetic",
+                            status: false, message: "Street name invalid. It can contain alphabete and Number"
                         });
                     }
 
-                    obj.address.billing.street = address.billing.street
+                    obj.address.billing.street = billing.street
                 }
 
-                if (address.billing.city) {
-                    if (!cityRegex.test(address.billing.city)) {
+                if (billing.city) {
+                    if (!isValidCity(address.billing.city)) {
                         return res.status(400).send({
-                            status: false, message: "City should be Valid and Its alphabetic",
+                            status: false, message: "City name invalid. It can contain only alphabete."
                         });
                     }
-                    obj.address.billing.city = address.billing.city
+                    obj.address.billing.city = billing.city
 
                 }
 
-                if (address.billing.pincode) {
-                    if (!pincodeRegex.test(address.billing.pincode)) {
+                if (billing.pincode) {
+                    if (!isValidPin(address.billing.pincode)) {
                         return res.status(400).send({
-                            status: false, message: "Pincode should have only 6 digits. No alphabets",
+                            status: false, message: "Pincode should have only 6 digits and only numerical elements.",
                         });
                     }
-                    obj.address.billing.pincode = address.billing.pincode
+                    obj.address.billing.pincode = billing.pincode
                 }
             }
         }
@@ -309,7 +349,7 @@ const updateUserDetails = async (req, res) => {
 
         let updateProfileDetails = await userModel.findOneAndUpdate({ _id: userId }, { $set: obj }, { new: true })
 
-        return res.status(200).send({ status: true, message: "User Update Successful!!", data: updateProfileDetails })
+        return res.status(200).send({ status: true, message: "User Update Successfully !!", data: updateProfileDetails })
 
 
 
@@ -323,8 +363,4 @@ const updateUserDetails = async (req, res) => {
 
 
 
-
-
-
-
-module.exports = {registerUser, userLogin, getUser, updateUserDetails }
+module.exports = { registerUser, userLogin, getUser, updateUserDetails }
