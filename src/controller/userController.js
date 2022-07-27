@@ -2,13 +2,9 @@ const userModel = require("../models/userModel")
 const jwt=require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const { uploadFile } = require("../AWS/aws")
-const { isValid, isValidMail, isValidMobile, isValidRequest, isValidPassword } = require("../validator/validation")
+const {isValid, validName, isValidMail,isValidRequest,isValidMobile, isValidPassword, isValidStreet, isValidCity, isValidPin } = require("../validator/validation")
 
-// Regex. Remove this if function is build in validation file. 
 
-const streetRegex = /^([a-zA-Z0-9 ]{2,50})*$/
-const cityRegex = /^[a-zA-z]+([\s][a-zA-Z]+)*$/
-const pincodeRegex = /^\d{6}$/
 
 
 const registerUser = async function (req, res) {
@@ -177,7 +173,7 @@ const updateUserDetails = async (req, res) => {
         let file = req.files
         let address = data.address
         let { shipping, billing } = address
-        // validate body 
+       
         if (!isValidRequest(data)) {
             return res.status(400).send({ status: false, message: "Invalid Request" })
         }
@@ -248,9 +244,9 @@ const updateUserDetails = async (req, res) => {
         }
 
         if (address) {
-            obj.address={}
+           
             if (address.shipping) {
-                obj.address.shipping={}
+               
 
                 if (address.shipping.street) {
                     if (!isValidStreet(address.shipping.street)) {
@@ -259,7 +255,7 @@ const updateUserDetails = async (req, res) => {
                         });
                     }
                     console.log(shipping.street)
-                    obj.address.shipping.street = address.shipping.street
+                    obj["address.shipping.street"] = address.shipping.street
                    
 
                 }
@@ -271,7 +267,7 @@ const updateUserDetails = async (req, res) => {
                         });
                     }
 
-                    obj.address.shipping.city = address.shipping.city
+                    obj["address.shipping.city"] = address.shipping.city
                 }
 
                 if (address.shipping.pincode) {
@@ -280,12 +276,12 @@ const updateUserDetails = async (req, res) => {
                             status: false, message: "Pincode should have only 6 digits and only number",
                         });
                     }
-                    obj.address.shipping.pincode = address.shipping.pincode
+                    obj["address.shipping.pincode"] = address.shipping.pincode
                 }
             }
 
             if (address.billing) {
-                obj.address.billing={}
+                
 
                 if (address.billing.street) {
                     if (!isValidStreet(address.billing.street)) {
@@ -294,7 +290,7 @@ const updateUserDetails = async (req, res) => {
                         });
                     }
 
-                    obj.address.billing.street = address.billing.street
+                    obj["address.billing.street"] = address.billing.street
                 }
 
                 if (address.billing.city) {
@@ -303,7 +299,7 @@ const updateUserDetails = async (req, res) => {
                             status: false, message: "City name invalid. It can contain only alphabete."
                         });
                     }
-                    obj.address.billing.city = address.billing.city
+                    obj["address.billing.city"] = address.billing.city
 
                 }
 
@@ -313,7 +309,7 @@ const updateUserDetails = async (req, res) => {
                             status: false, message: "Pincode should have only 6 digits and only numerical elements.",
                         });
                     }
-                    obj.address.billing.pincode = address.billing.pincode
+                    obj["address.billing.pincode"] = address.billing.pincode
                 }
             }
         }
