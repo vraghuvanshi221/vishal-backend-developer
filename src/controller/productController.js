@@ -118,6 +118,8 @@ const createProduct = async function (req, res) {
     }
 };
 
+//------------------------------------------------update product------------------------------------------------------------------------//
+
 
 const updateProductDetails = async function (req, res) {
     try {
@@ -184,6 +186,9 @@ const updateProductDetails = async function (req, res) {
         };
         if (availableSizes) {
             if (!isValid(availableSizes)) return res.status(400).send({ status: false, msg: "Enter availableSizes" });
+            if(!isValidSize(availableSizes)){
+                return res.status(400).send({ status: false, message: "sizes should be among [S, XS , M , X, L, XXL,X]" })
+            }
             obj.availableSizes = availableSizes
         };
         if (installments) {
@@ -212,11 +217,65 @@ const updateProductDetails = async function (req, res) {
         return res.status(500).send({ status: false, message: err.message })
     }
 };
+// *************************** Get product by Id **************************
+
+const getProductsById = async function (req, res) {
+    try {
+        let productId = req.params.productId;
+
+        if (!isValidObjectId(productId)) {
+            return res.status(400).send({ status: false, message: 'Please provide valid productId' })
+        }
+
+        const product = await productModel.findOne({ _id: productId, isDeleted: false })
+        if (product == null) return res.status(404).send({ status: false, message: "No product found" })
+
+        return res.status(200).send({ status: true, message: 'Success', data: product })
+    } catch (err) {
+        res.status(500).send({ status: false, error: err.message })
+    }
+}
+
+
+
+// ************************** Delete product by Id *************************
+
+const deleteProductById = async function (req, res) {
+
+    try {
+
+        let id = req.params.productId;
+        if (!isValidObjectId(id)) {
+            return res.status(400).send({ status: false, message: "product Id is invalid." });
+        }
+
+        let findProduct = await productModel.findOne({ _id: id });
+
+        if (findProduct == null) {
+            return res.status(404).send({ status: false, msg: "No such Product found" });
+        }
+        if (findProduct.isDeleted == true) {
+            return res.status(404).send({ status: false, msg: "Product is already deleted" });
+        }
+        if (findProduct.isDeleted == false) {
+            let Update = await productModel.findOneAndUpdate(
+                { _id: id },
+                { isDeleted: true, deletedAt: Date() },
+                { new: true }
+              );
+              return res.status(200).send({status: true,message: "successfully deleted the product",data:Update});
+        }
+
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({ status: false, Error: err.message });
+    }
+
+}
 
 
 
 
 
-
-
-module.exports={createProduct,updateProductDetails}
+module.exports={createProduct,getProductsById, deleteProductById,updateProductDetails}
