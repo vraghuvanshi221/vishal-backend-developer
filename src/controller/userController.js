@@ -5,6 +5,7 @@ const { uploadFile } = require("../AWS/aws")
 const { isValid, validName, isValidMail, isValidMobile, isValidRequest, isValidPassword, isValidStreet, isValidCity, isValidPin } = require("../validator/validation")
 
 
+
 //==============================================register user==============================================//
 
 const registerUser = async function (req, res) {
@@ -74,42 +75,44 @@ const registerUser = async function (req, res) {
                 return res.status(400).send({ status: false, msg: "Please enter address for shipping and billing purpose." })
             }
         if (!isValid(shipping.street)) {
-            return res.status(400).send({ status: false, msg: "please enter validshipping street information" });
+            return res.status(400).send({ status: false, msg: "please enter street for shipping." });
         }
         if (!isValid(shipping.city)) {
-            return res.status(400).send({ status: false, msg: "please enter valid shipping city information" });
+            return res.status(400).send({ status: false, msg: "please enter city for shipping." });
         }
         if (!isValidCity(shipping.city)) {
             return res.status(400).send({ status: false, msg: `${shipping.city} is not a valid city.` })
         }
 
         if (!isValid(shipping.pincode)) {
-            return res.status(400).send({ status: false, msg: "please enter pincode for shipping purpose." });
+            return res.status(400).send({ status: false, msg: "Please enter pincode for shipping." });
         }
         if (!isValidPin(shipping.pincode)) {
-            return res.status(400).send({ status: false, msg: `${shipping.pincode} is not a valid pincode` })
+            return res.status(400).send({ status: false, msg: `${shipping.pincode} is not a valid pincode.` })
         }
         if (!isValid(billing.street)) {
-            return res.status(400).send({ status: false, msg: "please enter billing street information" });
+            return res.status(400).send({ status: false, msg: "Please enter street for billing." });
         }
         if (!isValid(billing.city)) {
-            return res.status(400).send({ status: false, msg: "please enter city for billing purpose" });
+            return res.status(400).send({ status: false, msg: "Please enter city for billing." });
         }
         if (!isValidCity(billing.city)) {
             return res.status(400).send({ status: false, msg: `${billing.city} is not a valid city.` })
         }
         if (!isValid(billing.pincode)) {
-            return res.status(400).send({ status: false, msg: "please enter pincode for billing purpose." });
+            return res.status(400).send({ status: false, msg: "please enter pincode for billing." });
         }
         if (!isValidPin(billing.pincode)) {
             return res.status(400).send({ status: false, msg: `${billing.pincode} is not a valid pincode.` })
         }
 
         let profileImage = uploadedFileURL
-        if (!profileImage) return res.status(400).send({ status: false, msg: "don't leave upload files attribute, upload valid files" });
+        if (!profileImage) {
+            return res.status(400).send({ status: false, msg: "don't leave upload files attribute, upload valid files" });
+        }
         let responseBody = { fname, lname, email, profileImage, phone, password, address }
         let createUser = await userModel.create(responseBody)
-        return res.status(201).send({ status: true, message: "User created successfully ", data: createUser })
+        return res.status(201).send({ status: true, message: "User created successfully.", data: createUser })
     }
     catch (err) {
         res.status(500).send({ status: false, msg: err.message })
@@ -207,7 +210,7 @@ const updateUserDetails = async (req, res) => {
         let file = req.files
         let address = data.address
         let { shipping, billing } = address
-        // validate body 
+
         if (!isValidRequest(data)) {
             return res.status(400).send({ status: false, message: "Invalid Request" })
         }
@@ -278,9 +281,9 @@ const updateUserDetails = async (req, res) => {
         }
 
         if (address) {
-            obj.address = {}
+
             if (address.shipping) {
-                obj.address.shipping = {}
+
 
                 if (address.shipping.street) {
                     if (!isValidStreet(address.shipping.street)) {
@@ -289,7 +292,7 @@ const updateUserDetails = async (req, res) => {
                         });
                     }
                     console.log(shipping.street)
-                    obj.address.shipping.street = address.shipping.street
+                    obj["address.shipping.street"] = address.shipping.street
 
 
                 }
@@ -301,7 +304,7 @@ const updateUserDetails = async (req, res) => {
                         });
                     }
 
-                    obj.address.shipping.city = shipping.city
+                    obj["address.shipping.city"] = address.shipping.city
                 }
 
                 if (address.shipping.pincode) {
@@ -310,12 +313,12 @@ const updateUserDetails = async (req, res) => {
                             status: false, message: "Pincode should have only 6 digits and only number",
                         });
                     }
-                    obj.address.shipping.pincode = shipping.pincode
+                    obj["address.shipping.pincode"] = address.shipping.pincode
                 }
             }
 
             if (address.billing) {
-                obj.address.billing = {}
+
 
                 if (address.billing.street) {
                     if (!isValidStreet(address.billing.street)) {
@@ -324,7 +327,7 @@ const updateUserDetails = async (req, res) => {
                         });
                     }
 
-                    obj.address.billing.street = billing.street
+                    obj["address.billing.street"] = address.billing.street
                 }
 
                 if (address.billing.city) {
@@ -333,7 +336,7 @@ const updateUserDetails = async (req, res) => {
                             status: false, message: "City name invalid. It can contain only alphabete."
                         });
                     }
-                    obj.address.billing.city = billing.city
+                    obj["address.billing.city"] = address.billing.city
 
                 }
 
@@ -343,7 +346,7 @@ const updateUserDetails = async (req, res) => {
                             status: false, message: "Pincode should have only 6 digits and only numerical elements.",
                         });
                     }
-                    obj.address.billing.pincode = billing.pincode
+                    obj["address.billing.pincode"] = address.billing.pincode
                 }
             }
         }
