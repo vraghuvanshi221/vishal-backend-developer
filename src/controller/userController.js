@@ -152,6 +152,9 @@ const getUser = async function (req, res) {
             return res.status(403).send({ status: false, message: "User logged is not allowed to view the profile details" })
         }
         let userDetails=await userModel.findById(userId)
+        if(!userDetails){
+           return res.status(404).send({ status: false, message: "User not found"})
+        }
         res.status(200).send({ status: true, message: "User profile details" ,data:userDetails})
 
     }
@@ -190,7 +193,8 @@ const updateUserDetails = async (req, res) => {
 
         let { fname, lname, email, phone, password, address, profileImage } = data
         let obj = {}
-
+        //let street=address.shipping.street
+//let {shipping,billing}=address
         if (fname) {
             // validate fname
             obj.fname = fname
@@ -239,17 +243,19 @@ const updateUserDetails = async (req, res) => {
 
         }
 
+        
+        console.log(address.shipping.street)
         if (address) {
-
             if (address.shipping) {
-
+console.log(obj)
                 if (address.shipping.street) {
                     if (!streetRegex.test(address.shipping.street)) {
                         return res.status(400).send({
                             status: false, message: "Street should be Valid and Its alphabetic and Number",
                         });
                     }
-                    obj.address.shipping.street = address.shipping.street
+                    let street=address.shipping.street
+                   obj["address.shipping.street"] = street
 
                 }
 
@@ -260,7 +266,7 @@ const updateUserDetails = async (req, res) => {
                         });
                     }
 
-                    obj.address.shipping.city = address.shipping.city
+                    obj["address.shipping.city"] = address.shipping.city
                 }
 
                 if (address.shipping.pincode) {
@@ -317,8 +323,8 @@ const updateUserDetails = async (req, res) => {
             }
 
         }
-
-        let updateProfileDetails = await userModel.findOneAndUpdate({ _id: userId }, { $set: obj }, { new: true })
+        //{"address[shipping][street]":street},
+        let updateProfileDetails = await userModel.findOneAndUpdate({ _id: userId },{ $set: obj}, { new: true })
 
         return res.status(200).send({ status: true, message: "User Update Successful!!", data: updateProfileDetails })
 
