@@ -189,6 +189,9 @@ const getUser = async function (req, res) {
             return res.status(403).send({ status: false, message: "User logged is not allowed to view the profile details" })
         }
         let userDetails = await userModel.findById(userId)
+        if(!userDetails){
+            return res.status(404).send({ status: false, message: "user not found"})   
+        }
         res.status(200).send({ status: true, message: "User profile details", data: userDetails })
 
     }
@@ -357,17 +360,18 @@ const updateUserDetails = async (req, res) => {
             }
         }
 
-        if (profileImage) {
+        
             if (file) {
 
-                if (!(file && file.length > 0))
-                    return res.status(400).send({ status: false, message: "please provide profile image" })
-
-                let userImage = await aws_s3.uploadFile(file[0])
+                if (file && file.length > 0){
+                const userImage = await uploadFile(file[0])
                 obj.profileImage = userImage
             }
+            else{
+                return res.status(400).send({ status: false, message: "please provide profile image" })
+            }}
 
-        }
+        
 
         let updateProfileDetails = await userModel.findOneAndUpdate({ _id: userId }, { $set: obj }, { new: true })
 

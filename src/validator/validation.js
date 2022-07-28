@@ -52,20 +52,17 @@ const isValidObjectId = function (objectId) {
 const isValidSize = function (size) {
   
   let flag=0
-if(size.length>1){
   for (x in size) {
-    let ret= ["S", "XS", "M", "X", "L", "XXL", "XL", ].indexOf(size[x]) != -1
+    let ret= ["S", "XS", "M", "X", "L", "XXL", "XL" ].indexOf(size[x]) != -1
     if(!ret){
-      console.log("hello")
       flag=1
       break
     }}
     if(flag==1)return false
     else return true
 }
-else
-return ["S", "XS", "M", "X", "L", "XXL", "XL"].indexOf(size) != -1
-}
+
+
    
     
     
@@ -77,12 +74,12 @@ return ["S", "XS", "M", "X", "L", "XXL", "XL"].indexOf(size) != -1
   }
  
 
-const isFloat = function (n) {
-  return Number(n) === n && n % 1 !== 0;
+const isInt = function (n) {
+  return  n % 1 ===0;
 }
 
 module.exports = {
   isValid, validName, isValidMail, isValidRequest,
   isValidMobile, isValidPassword, isValidStreet, isValidCity, isValidPin, isValidObjectId, removeExtraSpace,
-  isValidSize, isValidSize, isFloat
+  isValidSize, isValidSize, isInt
 }
