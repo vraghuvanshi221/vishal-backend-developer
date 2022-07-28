@@ -104,9 +104,9 @@ const createProduct = async function (req, res) {
             let uploadedFileURL = await uploadFile(files[0])
             newProductDetail.productImage = uploadedFileURL
         }
-        // else {
-        //    return res.status(400).send({ status: false, message: "product image file is required" })
-        // }
+        else {
+           return res.status(400).send({ status: false, message: "product image file is required" })
+        }
 
         const newProduct=await productModel.create(newProductDetail)
          res.status(201).send({status:true,message: "Product created successfully",data:newProduct})
