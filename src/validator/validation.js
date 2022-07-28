@@ -74,12 +74,12 @@ const isValidSize = function (size) {
   }
  
 
-const isFloat = function (n) {
-  return Number(n) === n && n % 1 !== 0;
+const isInt = function (n) {
+  return  n % 1 ===0;
 }
 
 module.exports = {
   isValid, validName, isValidMail, isValidRequest,
   isValidMobile, isValidPassword, isValidStreet, isValidCity, isValidPin, isValidObjectId, removeExtraSpace,
-  isValidSize, isValidSize, isFloat
+  isValidSize, isValidSize, isInt
 }
