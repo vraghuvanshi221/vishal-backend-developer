@@ -19,6 +19,7 @@ router.post("/products",createProduct);
 router.put("/products/:productId",updateProductDetails);
 router.get("/products/:productId", getProductsById);
 router.delete("/products/:productId", deleteProductById);
+//router.get("/products",getProduct)
 
 // ==========> This API is used for handling any invalid Endpoints <=========== 
 router.all("/*", async function (req, res) {
