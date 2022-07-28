@@ -8,6 +8,7 @@ const { isValid,
 const { uploadFile } = require("../AWS/aws")
 
 
+//==============================================createProduct==============================================//
 
 const createProduct = async function (req, res) {
     try {
@@ -117,8 +118,7 @@ const createProduct = async function (req, res) {
     }
 };
 
-//------------------------------------------------update product------------------------------------------------------------------------//
-
+//==============================================updateProduct==============================================//
 
 const updateProductDetails = async function (req, res) {
     try {
@@ -218,6 +218,8 @@ const updateProductDetails = async function (req, res) {
 };
 
 
+//===============================================getProduct===============================================//
+
 const getProduct = async function (req, res) {
     try {
         let data = req.query
@@ -231,14 +233,23 @@ const getProduct = async function (req, res) {
                 return res.status(404).send({ status: false, msg: "No product found." })
             }
         } else {
-            // if(data.size){
-            //     data.size = {$in: data.size.split(",")}
-            // }
+            if(data.size){
+                data.size = {$in: data.size.split(",")}
+            }
+            if(data.priceLessThan){
+                data.priceLessThan = {$lt: data.priceLessThan}
+            }
+            if(data.priceGreaterThan){
+                data.priceGreaterThan = {$gt: data.priceGreaterThan}
+            }
+            if(data.priceGreaterThan && data.priceLessThan){
+                
+            }
             filter["$or"] = [
                 { availableSizes: data.size },
-                { title: data.name }
-                // { priceGreaterThan: price.priceGreaterThan },
-                // { priceLessThan: price.priceLessThan }
+                { title: data.name },
+                {price: data.priceLessThan || data.priceGreaterThan}
+                // {price: data.priceGreaterThan}
             ]
             const productByFilter = await productModel.find(filter)
             if(productByFilter.length == 0){
