@@ -10,6 +10,7 @@ isValidNumberInt,isValidNumber} = require("../validator/validation")
 const { uploadFile } = require("../AWS/aws")
 
 
+//==============================================createProduct==============================================//
 
 const createProduct = async function (req, res) {
     try {
@@ -120,11 +121,13 @@ const createProduct = async function (req, res) {
 
 // ************************** Get product by filter *************************
 
+//===============================================getProduct===============================================//
+
 const getProduct = async function (req, res) {
     try {
 
         let data = req.query
-        let obj = {
+        let filter = {
             isDeleted: false
         }
 
@@ -132,7 +135,7 @@ const getProduct = async function (req, res) {
             if (!isValid(data.name)) {
                 return res.status(400).send({ status: false, message: "Invalid input of name" })
             }
-            obj.title = data.name
+            filter.title = data.name
         }
 
         if (data.size) {
@@ -145,28 +148,28 @@ const getProduct = async function (req, res) {
                 return res.status(400).send({ status: false, message: "sizes should be among [S, XS , M , X, L, XXL,X]" })
             }
 
-            obj.availableSizes = data.size
+            filter.availableSizes = data.size
         }
 
         if (data.priceGreaterThan) {
             if (!isValid(data.priceGreaterThan)) {
                 return res.status(400).send({ status: false, messsage: "Price greater than must have valid input" })
             }
-            obj.price = { '$gt': data.priceGreaterThan }
+            filter.price = { '$gt': data.priceGreaterThan }
         }
 
         if (data.priceLessThan) {
             if (!isValid(data.priceLessThan)) {
                 return res.status(400).send({ status: false, messsage: "price Less than than must have valid input" })
             }
-            obj.price = { '$lt': data.priceLessThan }
+            filter.price = { '$lt': data.priceLessThan }
         }
 
         if (data.priceGreaterThan && data.priceLessThan) {
-            obj.price = { '$gt': data.priceGreaterThan, '$lt': data.priceLessThan }
+            filter.price = { '$gt': data.priceGreaterThan, '$lt': data.priceLessThan }
         }
 
-        const product = await productModel.find(obj).sort({ price: 1 });
+        const product = await productModel.find(filter).sort({ price: 1 });
 
         if (product.length > 0)
             return res.status(200).send({ status: true, message: "Success", data: product })
@@ -178,7 +181,6 @@ const getProduct = async function (req, res) {
         console.log(err)
         res.status(500).send({ status: false, Error: err.message });
     }
-
 }
 
 
@@ -343,7 +345,6 @@ const deleteProductById = async function (req, res) {
         console.log(err)
         res.status(500).send({ status: false, Error: err.message });
     }
-
 }
 
 
@@ -351,12 +352,3 @@ const deleteProductById = async function (req, res) {
 
 
 module.exports = { createProduct, getProduct, getProductsById, deleteProductById, updateProductDetails, getProduct }
-
-
-
-
-
-
-
-
-

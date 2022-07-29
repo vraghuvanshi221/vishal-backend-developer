@@ -17,6 +17,7 @@ router.put("/user/:userId/profile",authentication, updateUserDetails)
 
 router.post("/products",createProduct);
 router.put("/products/:productId",updateProductDetails);
+router.get("/products", getProduct)
 router.get("/products/:productId", getProductsById);
 router.delete("/products/:productId", deleteProductById);
 router.get("/products",getProduct);
