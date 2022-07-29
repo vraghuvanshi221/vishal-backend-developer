@@ -4,7 +4,6 @@ const { isValid,
     isValidObjectId,
     removeExtraSpace,
     isValidSize,
-    isInt,
     validName,
     isValidNumberInt, isValidNumber } = require("../validator/validation")
 const { uploadFile } = require("../AWS/aws")
@@ -83,6 +82,7 @@ const createProduct = async function (req, res) {
         }
 
         if (availableSizes) {
+            availableSizes = availableSizes.toUpperCase()
             availableSizes = availableSizes.split(",")
             if (!isValidSize(availableSizes)) {
                 return res.status(400).send({ status: false, message: "sizes should be among [S, XS , M , X, L, XXL,X]" })
@@ -253,7 +253,7 @@ const updateProductDetails = async function (req, res) {
             obj.description = description
         };
         if (price) {
-            if (!isValid(price) && isNaN(Number(price))) return res.status(400).send({ status: false, msg: "Enter valid no in price" });
+            if (!(isValid(price) && isValidNumber(price))) return res.status(400).send({ status: false, msg: "Enter valid no in price" });
             obj.price = price
         };
         if (currencyId) {
@@ -292,6 +292,7 @@ const updateProductDetails = async function (req, res) {
         if (availableSizes) {
             if (!isValid(availableSizes))
                 return res.status(400).send({ status: false, msg: "Enter availableSizes" });
+            availableSizes = availableSizes.toUpperCase()
             availableSizes = availableSizes.split(",")
             if (!isValidSize(availableSizes)) {
                 return res.status(400).send({ status: false, message: "sizes should be among [S, XS , M , X, L, XXL,X]" })
@@ -299,7 +300,7 @@ const updateProductDetails = async function (req, res) {
             obj.availableSizes = availableSizes
         };
         if (installments) {
-            if (isNaN(Number(installments)) || (!isInt(installments)))
+            if (!(isValid(installments)&&isValidNumberInt(installments)))
                 return res.status(400).send({ status: false, msg: "Enter valid number in installments" });
             obj.installments = installments
         };
