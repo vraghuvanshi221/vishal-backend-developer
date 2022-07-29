@@ -4,7 +4,7 @@ const { isValid,
     isValidObjectId,
     removeExtraSpace,
     isValidSize,
-    isInt } = require("../validator/validation")
+    isInt, isValidPriceSort } = require("../validator/validation")
 const { uploadFile } = require("../AWS/aws")
 
 
@@ -121,11 +121,8 @@ const createProduct = async function (req, res) {
 
 const getProduct = async function (req, res) {
     try {
-
         let data = req.query
-        let filter = {
-            isDeleted: false
-        }
+        let filter = { isDeleted: false }
 
         if (data.name) {
             console.log(data.name)
@@ -137,26 +134,34 @@ const getProduct = async function (req, res) {
 
         if (data.size) {
             data.size = data.size.toUpperCase()
+            data.size = data.size.split(",")
             if (!isValid(data.size)) {
                 return res.status(400).send({ status: false, message: "Invalid input of size" })
             }
             if (!isValidSize(data.size)) {
                 return res.status(400).send({ status: false, message: "sizes should be among [S, XS , M , X, L, XXL,X]" })
             }
-
             filter.availableSizes = data.size
         }
 
+        // if(data.size){
+        //     console.log(data.size)
+        //     data.size = {$in: data.size.split(", ")}
+        //     console.log(data.size)
+        //     filter.availableSizes = data.size
+        // }
+
+
         if (data.priceGreaterThan) {
-            if (!isValid(data.priceGreaterThan)) {
-                return res.status(400).send({ status: false, messsage: "Price greater than must have valid input" })
+            if (isNaN(data.priceGreaterThan)) {
+                return res.status(400).send({ status: false, messsage: "Price filter can have only numeric value." })
             }
             filter.price = { '$gt': data.priceGreaterThan }
         }
 
         if (data.priceLessThan) {
-            if (!isValid(data.priceLessThan)) {
-                return res.status(400).send({ status: false, messsage: "price Less than than must have valid input" })
+            if (isNaN(data.priceLessThan)) {
+                return res.status(400).send({ status: false, messsage: "Price filter can have only numeric value." })
             }
             filter.price = { '$lt': data.priceLessThan }
         }
@@ -167,8 +172,9 @@ const getProduct = async function (req, res) {
 
         const product = await productModel.find(filter).sort({ price: 1 });
 
-        if (product.length > 0)
+        if (product.length > 0) {
             return res.status(200).send({ status: true, message: "Success", data: product })
+        }
         else
             return res.status(404).send({ status: false, message: "No data found" })
 

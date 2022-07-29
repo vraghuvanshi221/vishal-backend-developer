@@ -26,8 +26,6 @@ const isValidMobile = function (num) {
   return /^[6789]\d{9}$/.test(num);
 };
 
-
-
 const isValidStreet = function (street) {
   return /^([a-zA-Z0-9 ]{2,50})*$/.test(street)
 }
@@ -50,33 +48,36 @@ const isValidObjectId = function (objectId) {
 }
 
 const isValidSize = function (size) {
-  
-  let flag=0
+
+  let flag = 0
   for (x in size) {
-    let ret= ["S", "XS", "M", "X", "L", "XXL", "XL" ].indexOf(size[x]) != -1
-    if(!ret){
-      flag=1
+    let ret = ["S", "XS", "M", "X", "L", "XXL", "XL"].indexOf(size[x]) != -1
+    if (!ret) {
+      flag = 1
       break
-    }}
-    if(flag==1)return false
-    else return true
+    }
+  }
+  if (flag == 1) return false
+  else return true
 }
 
 
-   
-    
-    
-  const isValidPassword = function (password){
-    if(password.length>=8 && password.length<=15){
-      return true
-    }
-    return false
+const isValidPassword = function (password) {
+  if (password.length >= 8 && password.length <= 15) {
+    return true
   }
- 
+  return false
+}
+
 
 const isInt = function (n) {
-  return  n % 1 ===0;
+  return n % 1 === 0;
 }
+
+// const isValidPriceSort = function (value) {
+//   if (typeof value == String) {return false};
+//   if (typeof value ==Number) return true
+// }
 
 module.exports = {
   isValid, validName, isValidMail, isValidRequest,
