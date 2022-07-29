@@ -4,7 +4,9 @@ const { isValid,
     isValidObjectId,
     removeExtraSpace,
     isValidSize,
-    isInt, isValidPriceSort } = require("../validator/validation")
+    isInt ,
+validName,
+isValidNumberInt,isValidNumber} = require("../validator/validation")
 const { uploadFile } = require("../AWS/aws")
 
 
@@ -39,7 +41,7 @@ const createProduct = async function (req, res) {
         }
         newProductDetail.description = description
 
-        if (!isValid(price) && isNaN(Number(price))) {
+        if (!(isValid(price) && isValidNumber(price))) {
             return res.status(400).send({ status: false, message: "price is mandatory and should be a valid number" })
         }
         newProductDetail.price = price
@@ -88,8 +90,10 @@ const createProduct = async function (req, res) {
             newProductDetail.availableSizes = availableSizes
         }
 
-        if (installments) {
-            if (isNaN(Number(installments) || !isInt(installments))) {
+        
+        if (isValid(installments)) {
+            
+            if(!isValidNumberInt(installments)){
                 return res.status(400).send({ status: false, message: "please send some valid value in installments" })
             }
             newProductDetail.installments = installments
@@ -125,7 +129,6 @@ const getProduct = async function (req, res) {
         let filter = { isDeleted: false }
 
         if (data.name) {
-            console.log(data.name)
             if (!isValid(data.name)) {
                 return res.status(400).send({ status: false, message: "Invalid input of name" })
             }
@@ -138,6 +141,7 @@ const getProduct = async function (req, res) {
             if (!isValid(data.size)) {
                 return res.status(400).send({ status: false, message: "Invalid input of size" })
             }
+            data.size=data.size.split(",")
             if (!isValidSize(data.size)) {
                 return res.status(400).send({ status: false, message: "sizes should be among [S, XS , M , X, L, XXL,X]" })
             }
@@ -235,7 +239,7 @@ const updateProductDetails = async function (req, res) {
 
             const uniqueTitle = await productModel.findOne({ title: title, isDeleted: false });
             if (uniqueTitle) {
-                return res.status(400).send({ status: false, message: "Title Allready Exist Use different Title" });
+                return res.status(400).send({ status: false, message: "Title Already Exist Use different Title" });
             }
             obj.title = title;
         };

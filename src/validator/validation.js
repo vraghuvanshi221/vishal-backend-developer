@@ -74,13 +74,14 @@ const isInt = function (n) {
   return n % 1 === 0;
 }
 
-// const isValidPriceSort = function (value) {
-//   if (typeof value == String) {return false};
-//   if (typeof value ==Number) return true
-// }
-
+const isValidNumberInt=function (value){
+  return (!(isNaN(Number(value)))&&(value%1===0))
+}
+const isValidNumber=function(value){
+  return (!(isNaN(Number(value))))
+}
 module.exports = {
   isValid, validName, isValidMail, isValidRequest,
   isValidMobile, isValidPassword, isValidStreet, isValidCity, isValidPin, isValidObjectId, removeExtraSpace,
-  isValidSize, isValidSize, isInt
+  isValidSize, isValidSize, isInt,isValidNumberInt,isValidNumber
 }
