@@ -2,7 +2,11 @@ const userModel = require("../models/userModel")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const { uploadFile } = require("../AWS/aws")
-const { isValid, validName, isValidMail, isValidMobile, isValidRequest, isValidPassword, isValidStreet, isValidCity, isValidPin } = require("../validator/validation")
+const { isValid,isValidObjectId, 
+    validName, isValidMail, 
+    isValidMobile, isValidRequest, 
+    isValidPassword, isValidStreet, 
+    isValidCity, isValidPin } = require("../validator/validation")
 
 
 
@@ -208,16 +212,13 @@ const getUser = async function (req, res) {
 const updateUserDetails = async (req, res) => {
     try {
         let userId = req.params.userId
+
+        if (!isValidObjectId(userId)) {
+            return res.status(400).send({ status: false, msg: "Please provide a valid userId" });}
+            
+            //===================================checking Authorization==================================
         if (req.loginId != userId) {
             return res.status(403).send({ status: false, message: "User logged is not allowed to update the profile details" })
-        }
-
-        let data = req.body
-        let file = req.files
-        let address = data.address
-
-        if ((Object.keys(data).length == 0) && (!isValid(file))) {
-            return res.status(400).send({ status: 400, msg: "Invalid request" });
         }
 
 
@@ -226,8 +227,16 @@ const updateUserDetails = async (req, res) => {
             return res.status(404).send({ status: false, message: "user not found" })
         }
 
+        let data = req.body
+        let file = req.files
+        let address = data.address
+console.log(file)
+        if ((Object.keys(data).length == 0) && (!isValid(file))) {
+            return res.status(400).send({ status: 400, msg: "Invalid request" });
+        }
 
-        let { fname, lname, email, phone, password, profileImage } = data
+
+       let { fname, lname, email, phone, password} = data
 
         let obj = {}
 
@@ -292,7 +301,7 @@ const updateUserDetails = async (req, res) => {
                             status: false, message: "Street name invalid. It can contain alphabete and Number",
                         });
                     }
-                    console.log(shipping.street)
+                    
                     obj["address.shipping.street"] = address.shipping.street
 
 
