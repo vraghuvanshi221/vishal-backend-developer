@@ -4,9 +4,9 @@ const { isValid,
     isValidObjectId,
     removeExtraSpace,
     isValidSize,
-    isInt ,
-validName,
-isValidNumberInt,isValidNumber} = require("../validator/validation")
+    isInt,
+    validName,
+    isValidNumberInt, isValidNumber } = require("../validator/validation")
 const { uploadFile } = require("../AWS/aws")
 
 
@@ -90,10 +90,10 @@ const createProduct = async function (req, res) {
             newProductDetail.availableSizes = availableSizes
         }
 
-        
+
         if (isValid(installments)) {
-            
-            if(!isValidNumberInt(installments)){
+
+            if (!isValidNumberInt(installments)) {
                 return res.status(400).send({ status: false, message: "please send some valid value in installments" })
             }
             newProductDetail.installments = installments
@@ -121,7 +121,6 @@ const createProduct = async function (req, res) {
 
 // ************************** Get product by filter *************************
 
-//===============================================getProduct===============================================//
 
 const getProduct = async function (req, res) {
     try {
@@ -135,7 +134,7 @@ const getProduct = async function (req, res) {
             if (!isValid(data.name)) {
                 return res.status(400).send({ status: false, message: "Invalid input of name" })
             }
-            filter.title = data.name
+            filter.title ={'$regex':data.name}
         }
 
         if (data.size) {
@@ -143,33 +142,45 @@ const getProduct = async function (req, res) {
             if (!isValid(data.size)) {
                 return res.status(400).send({ status: false, message: "Invalid input of size" })
             }
-            data.size=data.size.split(",")
+            data.size = data.size.split(",")
             if (!isValidSize(data.size)) {
                 return res.status(400).send({ status: false, message: "sizes should be among [S, XS , M , X, L, XXL,X]" })
             }
 
-            filter.availableSizes = data.size
+            filter.availableSizes = {'$in': data.size}
         }
 
-        if (data.priceGreaterThan) {
-            if (!isValid(data.priceGreaterThan)) {
-                return res.status(400).send({ status: false, messsage: "Price greater than must have valid input" })
+        if (data.priceGreaterThan && data.priceLessThan) {
+            if (!(isValid(data.priceGreaterThan) && isValidNumber(data.priceGreaterThan))) {
+                return res.status(400).send({ status: false, message: "price greatr than value should be a numeric value" })
+            }
+            if (!(isValid(data.priceLessThan) && isValidNumber(data.priceLessThan))) {
+                return res.status(400).send({ status: false, message: "price less than value should be a numeric value" })
+            }
+            filter.price = { '$gt': data.priceGreaterThan, '$lt': data.priceLessThan }
+        }
+
+        else if (data.priceGreaterThan) {
+            if (!(isValid(data.priceGreaterThan) && isValidNumber(data.priceGreaterThan))) {
+                return res.status(400).send({ status: false, message: "price greatr than value should be a numeric value" })
             }
             filter.price = { '$gt': data.priceGreaterThan }
         }
 
-        if (data.priceLessThan) {
-            if (!isValid(data.priceLessThan)) {
-                return res.status(400).send({ status: false, messsage: "price Less than than must have valid input" })
+        else if (data.priceLessThan) {
+            if (!(isValid(data.priceLessThan) && isValidNumber(data.priceLessThan))) {
+                return res.status(400).send({ status: false, message: "price less than value should be a numeric value" })
             }
             filter.price = { '$lt': data.priceLessThan }
         }
 
-        if (data.priceGreaterThan && data.priceLessThan) {
-            filter.price = { '$gt': data.priceGreaterThan, '$lt': data.priceLessThan }
+        if (data.priceSort) {
+            priceSort = data.priceSort
+        } else {
+            priceSort = 1
         }
 
-        const product = await productModel.find(filter).sort({ price: 1 });
+        const product = await productModel.find(filter).sort({ price: priceSort });
 
         if (product.length > 0)
             return res.status(200).send({ status: true, message: "Success", data: product })
