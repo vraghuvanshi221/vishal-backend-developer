@@ -5,7 +5,8 @@ const { isValid,
     removeExtraSpace,
     isValidSize,
     isInt ,
-validName} = require("../validator/validation")
+validName,
+isValidNumberInt,isValidNumber} = require("../validator/validation")
 const { uploadFile } = require("../AWS/aws")
 
 
@@ -39,7 +40,7 @@ const createProduct = async function (req, res) {
         }
         newProductDetail.description = description
 
-        if (!(isValid(price) && !isNaN(Number(price)))) {
+        if (!(isValid(price) && isValidNumber(price))) {
             return res.status(400).send({ status: false, message: "price is mandatory and should be a valid number" })
         }
         newProductDetail.price = price
@@ -88,11 +89,10 @@ const createProduct = async function (req, res) {
             newProductDetail.availableSizes = availableSizes
         }
 
-        console.log(installments)
+        
         if (isValid(installments)) {
-            console.log("hello",isNaN(Number(installments)),isInt(installments))
-            console.log(!((isNaN(Number(installments)))&&!isInt(installments)))
-            if (!(!(isNaN(Number(installments)))&&isInt(installments))) {
+            
+            if(!isValidNumberInt(installments)){
                 return res.status(400).send({ status: false, message: "please send some valid value in installments" })
             }
             newProductDetail.installments = installments
