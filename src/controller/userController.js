@@ -181,16 +181,16 @@ const userLogin = async function (req, res) {
 const getUser = async function (req, res) {
     try {
         let userId = req.params.userId
-        if(!isValidObjectId(userId)){
-            return res.status(400).send({ status: false, message: "Invalid object id"})   
+        if (!isValidObjectId(userId)) {
+            return res.status(400).send({ status: false, message: "Invalid object id" })
         }
         //-------------------------------------checking Authorizaton------------------------->>
         if (req.loginId != userId) {
             return res.status(403).send({ status: false, message: "User logged is not allowed to view the profile details" })
         }
         let userDetails = await userModel.findById(userId)
-        if(!userDetails){
-            return res.status(404).send({ status: false, message: "user not found"})   
+        if (!userDetails) {
+            return res.status(404).send({ status: false, message: "user not found" })
         }
         res.status(200).send({ status: true, message: "User profile details", data: userDetails })
 
@@ -215,14 +215,11 @@ const updateUserDetails = async (req, res) => {
         let data = req.body
         let file = req.files
         let address = data.address
-        let { shipping, billing } = address
 
-        if (!isValidRequest(data)) {
-            return res.status(400).send({ status: false, message: "Invalid Request" })
+        if ((Object.keys(data).length == 0) && (!isValid(file))) {
+            return res.status(400).send({ status: 400, msg: "Invalid request" });
         }
-        if (!isValid(data)) {
-            return res.status(400).send({ status: false, message: "Invalid Request" })
-        }
+
 
         const findUserData = await userModel.findById(userId)
         if (!findUserData) {
@@ -233,8 +230,7 @@ const updateUserDetails = async (req, res) => {
         let { fname, lname, email, phone, password, profileImage } = data
 
         let obj = {}
-        //let street=address.shipping.street
-//let {shipping,billing}=address
+
         if (fname) {
             if (!validName(fname)) {
                 return res.status(400).send({ status: false, message: "first name is not in right format" })
@@ -287,13 +283,9 @@ const updateUserDetails = async (req, res) => {
 
         }
 
-        
-        console.log(address.shipping.street)
         if (address) {
 
             if (address.shipping) {
-
-
                 if (address.shipping.street) {
                     if (!isValidStreet(address.shipping.street)) {
                         return res.status(400).send({
@@ -360,18 +352,19 @@ const updateUserDetails = async (req, res) => {
             }
         }
 
-        
-            if (file) {
 
-                if (file && file.length > 0){
+        if (file) {
+
+            if (file && file.length > 0) {
                 const userImage = await uploadFile(file[0])
                 obj.profileImage = userImage
             }
-            else{
+            else {
                 return res.status(400).send({ status: false, message: "please provide profile image" })
-            }}
+            }
+        }
 
-        
+
 
         let updateProfileDetails = await userModel.findOneAndUpdate({ _id: userId }, { $set: obj }, { new: true })
 
