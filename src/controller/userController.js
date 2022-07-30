@@ -2,7 +2,11 @@ const userModel = require("../models/userModel")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const { uploadFile } = require("../AWS/aws")
-const { isValid, validName, isValidMail, isValidMobile, isValidRequest, isValidPassword, isValidStreet, isValidCity, isValidPin } = require("../validator/validation")
+const { isValid, isValidObjectId,
+    validName, isValidMail,
+    isValidMobile, isValidRequest,
+    isValidPassword, isValidStreet,
+    isValidCity, isValidPin } = require("../validator/validation")
 
 
 
@@ -181,16 +185,16 @@ const userLogin = async function (req, res) {
 const getUser = async function (req, res) {
     try {
         let userId = req.params.userId
-        if(!isValidObjectId(userId)){
-            return res.status(400).send({ status: false, message: "Invalid object id"})   
+        if (!isValidObjectId(userId)) {
+            return res.status(400).send({ status: false, message: "Invalid object id" })
         }
         //-------------------------------------checking Authorizaton------------------------->>
         if (req.loginId != userId) {
             return res.status(403).send({ status: false, message: "User logged is not allowed to view the profile details" })
         }
         let userDetails = await userModel.findById(userId)
-        if(!userDetails){
-            return res.status(404).send({ status: false, message: "user not found"})   
+        if (!userDetails) {
+            return res.status(404).send({ status: false, message: "user not found" })
         }
         res.status(200).send({ status: true, message: "User profile details", data: userDetails })
 
@@ -208,33 +212,35 @@ const getUser = async function (req, res) {
 const updateUserDetails = async (req, res) => {
     try {
         let userId = req.params.userId
+
+        if (!isValidObjectId(userId)) {
+            return res.status(400).send({ status: false, msg: "Please provide a valid userId" });
+        }
+
+        //===================================checking Authorization==================================
         if (req.loginId != userId) {
             return res.status(403).send({ status: false, message: "User logged is not allowed to update the profile details" })
         }
 
-        let data = req.body
-        let file = req.files
-        let address = data.address
-        let { shipping, billing } = address
-
-        if (!isValidRequest(data)) {
-            return res.status(400).send({ status: false, message: "Invalid Request" })
-        }
-        if (!isValid(data)) {
-            return res.status(400).send({ status: false, message: "Invalid Request" })
-        }
 
         const findUserData = await userModel.findById(userId)
         if (!findUserData) {
             return res.status(404).send({ status: false, message: "user not found" })
         }
 
+        let data = req.body
+        let file = req.files
+        let address = data.address
+        console.log(file)
+        if ((Object.keys(data).length == 0) && (!isValid(file))) {
+            return res.status(400).send({ status: 400, msg: "Invalid request" });
+        }
 
-        let { fname, lname, email, phone, password, profileImage } = data
+
+        let { fname, lname, email, phone, password } = data
 
         let obj = {}
-        //let street=address.shipping.street
-//let {shipping,billing}=address
+
         if (fname) {
             if (!validName(fname)) {
                 return res.status(400).send({ status: false, message: "first name is not in right format" })
@@ -287,20 +293,16 @@ const updateUserDetails = async (req, res) => {
 
         }
 
-        
-        console.log(address.shipping.street)
         if (address) {
 
             if (address.shipping) {
-
-
                 if (address.shipping.street) {
                     if (!isValidStreet(address.shipping.street)) {
                         return res.status(400).send({
                             status: false, message: "Street name invalid. It can contain alphabete and Number",
                         });
                     }
-                    console.log(shipping.street)
+
                     obj["address.shipping.street"] = address.shipping.street
 
 
@@ -360,18 +362,19 @@ const updateUserDetails = async (req, res) => {
             }
         }
 
-        
-            if (file) {
 
-                if (file && file.length > 0){
+        if (file) {
+
+            if (file && file.length > 0) {
                 const userImage = await uploadFile(file[0])
                 obj.profileImage = userImage
             }
-            else{
+            else {
                 return res.status(400).send({ status: false, message: "please provide profile image" })
-            }}
+            }
+        }
 
-        
+
 
         let updateProfileDetails = await userModel.findOneAndUpdate({ _id: userId }, { $set: obj }, { new: true })
 
