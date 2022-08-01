@@ -200,7 +200,6 @@ const getProduct = async function (req, res) {
 
     }
     catch (err) {
-        console.log(err)
         res.status(500).send({ status: false, Error: err.message });
     }
 }
