@@ -134,7 +134,7 @@ const getProduct = async function (req, res) {
             if (!isValid(data.name)) {
                 return res.status(400).send({ status: false, message: "Invalid input of name" })
             }
-            filter.title ={'$regex':data.name}
+            filter.title ={'$regex':data.name,"$options":"$i"}
         }
 
         if (data.size) {
@@ -303,7 +303,7 @@ const updateProductDetails = async function (req, res) {
         if (installments) {
             if (!(isValid(installments)&&isValidNumberInt(installments)))
                 return res.status(400).send({ status: false, msg: "Enter valid number in installments" });
-            obj.installments = installments
+            obj["$push"]={installments:installments}
         };
 
         if (files && files.length > 0) {
@@ -349,7 +349,7 @@ const deleteProductById = async function (req, res) {
                 { isDeleted: true, deletedAt: Date() },
                 { new: true }
             );
-            return res.status(200).send({ status: true, message: "successfully deleted the product", data: Update });
+            return res.status(200).send({ status: true, message: "successfully deleted the product"});
         }
 
     }
