@@ -40,7 +40,7 @@ const isValidCity = function (city) {
 
 
 const isValidPin = function (pincode) {
-  return /^\d{6}$/.test(pincode)
+  return /^[1-9][0-9]{5}$/.test(pincode)
 }
 
 

@@ -142,7 +142,8 @@ const getProduct = async function (req, res) {
             if (!isValid(data.name)) {
                 return res.status(400).send({ status: false, message: "Please enter valid name for filter." })
             }
-            filter.title = { '$regex': data.name }
+            filter.title ={'$regex':data.name,"$options":"$i"}
+            
         }
 
         if (data.size) {
@@ -316,7 +317,7 @@ const updateProductDetails = async function (req, res) {
         if (installments) {
             if (!(isValid(installments) && isValidNumberInt(installments)))
                 return res.status(400).send({ status: false, msg: "Enter valid number in installments" });
-            obj.installments = installments
+            obj["$push"]={installments:installments}
         };
 
         if (files && files.length > 0) {
