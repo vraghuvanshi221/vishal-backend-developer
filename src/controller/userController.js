@@ -2,10 +2,10 @@ const userModel = require("../models/userModel")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const { uploadFile } = require("../AWS/aws")
-const { isValid,isValidObjectId, 
-    validName, isValidMail, 
-    isValidMobile, isValidRequest, 
-    isValidPassword, isValidStreet, 
+const { isValid, isValidObjectId,
+    validName, isValidMail,
+    isValidMobile, isValidRequest,
+    isValidPassword, isValidStreet,
     isValidCity, isValidPin } = require("../validator/validation")
 
 
@@ -214,9 +214,10 @@ const updateUserDetails = async (req, res) => {
         let userId = req.params.userId
 
         if (!isValidObjectId(userId)) {
-            return res.status(400).send({ status: false, msg: "Please provide a valid userId" });}
-            
-            //===================================checking Authorization==================================
+            return res.status(400).send({ status: false, msg: "Please provide a valid userId" });
+        }
+
+        //===================================checking Authorization==================================
         if (req.loginId != userId) {
             return res.status(403).send({ status: false, message: "User logged is not allowed to update the profile details" })
         }
@@ -230,13 +231,13 @@ const updateUserDetails = async (req, res) => {
         let data = req.body
         let file = req.files
         let address = data.address
-console.log(file)
+        console.log(file)
         if ((Object.keys(data).length == 0) && (!isValid(file))) {
             return res.status(400).send({ status: 400, msg: "Invalid request" });
         }
 
 
-       let { fname, lname, email, phone, password} = data
+        let { fname, lname, email, phone, password } = data
 
         let obj = {}
 
@@ -301,7 +302,7 @@ console.log(file)
                             status: false, message: "Street name invalid. It can contain alphabete and Number",
                         });
                     }
-                    
+
                     obj["address.shipping.street"] = address.shipping.street
 
 
