@@ -46,6 +46,7 @@ const isValidPin = function (pincode) {
 
 const removeExtraSpace = function (value) {
   const res = value.split(" ").filter(word => word).join(" ")
+ 
   return res
 }
 

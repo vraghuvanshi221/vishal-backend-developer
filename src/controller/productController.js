@@ -91,6 +91,9 @@ const createProduct = async function (req, res) {
         if (availableSizes) {
             availableSizes = availableSizes.toUpperCase()
             availableSizes = availableSizes.split(",")
+            for(let i in availableSizes){
+                availableSizes[i]=availableSizes[i].trim()
+            }
             if (!isValidSize(availableSizes)) {
                 return res.status(400).send({ status: false, message: "Sizes should be among [XS, S, M, L, XL, XXL]" })
             }
@@ -132,6 +135,7 @@ const createProduct = async function (req, res) {
 const getProduct = async function (req, res) {
     try {
         let data = req.query
+        
         let filter = { isDeleted: false }
 
         if (data.name) {
@@ -143,8 +147,11 @@ const getProduct = async function (req, res) {
 
         if (data.size) {
             data.size = data.size.toUpperCase()
+            for(let i in data.size){
+                data.size[i]=data.size[i].trim()
+            }
             data.size = data.size.split(",")
-
+        
             if (!isValidSize(data.size)) {
                 return res.status(400).send({ status: false, message: "Sizes should be among [XS, S, M, L, XL, XXL]" })
             }
@@ -298,6 +305,9 @@ const updateProductDetails = async function (req, res) {
                 return res.status(400).send({ status: false, msg: "Enter availableSizes" });
             availableSizes = availableSizes.toUpperCase()
             availableSizes = availableSizes.split(",")
+            for(let i in availableSizes){
+                availableSizes[i]=availableSizes[i].trim()
+            }
             if (!isValidSize(availableSizes)) {
                 return res.status(400).send({ status: false, message: "Sizes should be among [XS, S, M, L, XL, XXL]" })
             }
