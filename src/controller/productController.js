@@ -246,7 +246,7 @@ const updateProductDetails = async function (req, res) {
         if ((Object.keys(data).length == 0) && (!isValid(files))) {
             return res.status(400).send({ status: 400, msg: "Please enter product details for updation." });
         }
-        let { title, description, price, currencyId, currencyFormat, isFreeShipping, productImage, style, availableSizes, installments } = data;
+        let { title, description, price, currencyId, currencyFormat, isFreeShipping, style, availableSizes, installments } = data;
         let obj = {}
 
         if (title) {

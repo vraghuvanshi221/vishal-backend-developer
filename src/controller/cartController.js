@@ -143,6 +143,7 @@ const deleteCart = async function (req, res) {
 
 
 
+
 // ******************************** create cart ******************************** 
 
 const createCart = async function (req, res) {
@@ -269,10 +270,39 @@ const createCart = async function (req, res) {
     catch (err) {
         return res.status(500).send({ status: false, message: err.message })
     }
+};
+
+
+//===================================================getCart by UserId=============================================================//
+
+
+const getCart=async (req,res)=>{
+
+    try{
+
+        let userId=req.params.userId
+        if(!isValidObjectId(userId))return res.status(400).send({status:false,msg:"Send valid userId"});
+    
+        let checkUserId=await userModel.findById(userId);
+        if(!checkUserId)return res.status(404).send({status:false,msg:"userId doesn't exits"});
+    
+        // if(userId!=req.loginId) return res.status(403).send({status:false,msg:"unauthorized user"});
+    
+        let cart = await cartModel.findOne({userId:userId});
+        if(cart==null)return res.status(404).send({status:false,msg:"cart not available"});
+       
+            return res.status(200).send({status:true,msg:"cart found",data:cart});
+        
+
+    }
+    catch (err) {
+        return res.status(500).send({ status: false, message: err.message })
+    }
+
 }
 
 
 
 
 
-module.exports = {createCart, updateCart, deleteCart }
+module.exports = {createCart, updateCart, deleteCart,getCart }
