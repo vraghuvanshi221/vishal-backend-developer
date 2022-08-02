@@ -3,7 +3,7 @@ const express = require('express')
 const router = express.Router()
 const { registerUser, userLogin, getUser, updateUserDetails } = require('../controller/userController')
 const { createProduct, updateProductDetails, getProduct, getProductsById, deleteProductById } = require("../controller/productController")
-const {createCart,getCart} = require("../controller/cartController")
+const {createCart ,updateCart, deleteCart,getCart} = require("../controller/cartController")
 const { authentication } = require("../middleware/auth")
 
 
@@ -24,8 +24,12 @@ router.delete("/products/:productId", deleteProductById);
 
 // ****************************** Cart APIs ***************************
 
-router.post("/users/:userId/cart",createCart);
+
+router.post("/users/:userId/cart",authentication,createCart)
+router.put("/users/:userId/cart",authentication,updateCart)
+router.delete("/users/:userId/cart",authentication,deleteCart)
 router.get("/users/:userId/cart",getCart);
+
 
 
 // ==========> This API is used for handling any invalid Endpoints <=========== 
