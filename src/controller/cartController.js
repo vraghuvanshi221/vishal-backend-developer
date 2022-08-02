@@ -86,7 +86,7 @@ const updateCart = async function (req, res) {
             return res.status(404).send({ status: false, message: "No Product with this Id found in this Cart for current user" })
             }
             productExistInCart["_doc"]["productdetails"] = productExist
-            return res.status(200).send({ status: true, message: "updated sucessfully", data: productExistInCart })
+            return res.status(200).send({ status: true, message: "Success", data: productExistInCart })
         }
         if (removeProduct == 1) {
            
@@ -101,7 +101,7 @@ const updateCart = async function (req, res) {
             }
         
         productExistInCart["_doc"]["productdetails"] = productExist
-        res.status(200).send({ status: true, message: "updated sucessfully", data: productExistInCart })
+        res.status(200).send({ status: true, message: "Success", data: productExistInCart })
 
     }
 }
@@ -109,6 +109,9 @@ const updateCart = async function (req, res) {
         res.status(500).send({ status: false, Error: err.message });
     }
 }
+
+
+// ***********************************************  Delete api ******************************************
 
 const deleteCart = async function (req, res) {
     try {
@@ -125,7 +128,7 @@ const deleteCart = async function (req, res) {
             return res.status(403).send({ status: false, message: "User logged is not allowed to delete the cart details" })
         }
         let update = {
-            $pull: items,
+            $pull: {items:"items"},
             totalPrice: 0,
             totalItems: 0
         }

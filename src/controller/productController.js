@@ -48,29 +48,34 @@ const createProduct = async function (req, res) {
         }
         newProductDetail.price = price
 
-        if (!isValid(currencyId)) {
-            return res.status(400).send({ status: false, message: "Currency Id is mandatory." })
-        }
+        if (currencyId) {
+            if (!isValid(currencyId)) {
+                return res.status(400).send({ status: false, message: "Currency Id is invalid." })
+            }
 
-        if (currencyId != "INR") {
-            return res.status(400).send({ status: false, message: "Currency Id should be INR only." })
+            if (currencyId != "INR") {
+                return res.status(400).send({ status: false, message: "Currency Id should be INR only." })
+            }
         }
         else {
             currencyId = "INR"
         }
         newProductDetail.currencyId = currencyId
 
-        if (!isValid(currencyFormat)) {
-            return res.status(400).send({ status: false, message: "Currency format is mandatory." })
-        }
+        if (currencyFormat) {
+            if (!isValid(currencyFormat)) {
+                return res.status(400).send({ status: false, message: "Currency format is invalid." })
+            }
 
-        if (currencyFormat != '₹') {
-            return res.status(400).send({ status: false, message: "Currency Format should be '₹' only." })
+            if (currencyFormat != '₹') {
+                return res.status(400).send({ status: false, message: "Currency Format should be '₹' only." })
+            }
         }
         else {
             currencyFormat = "₹"
         }
         newProductDetail.currencyFormat = currencyFormat
+
 
         if (isFreeShipping) {
             if (!(isFreeShipping == 'true' || isFreeShipping == 'false')) {
@@ -91,8 +96,8 @@ const createProduct = async function (req, res) {
         if (availableSizes) {
             availableSizes = availableSizes.toUpperCase()
             availableSizes = availableSizes.split(",")
-            for(let i in availableSizes){
-                availableSizes[i]=availableSizes[i].trim()
+            for (let i in availableSizes) {
+                availableSizes[i] = availableSizes[i].trim()
             }
             if (!isValidSize(availableSizes)) {
                 return res.status(400).send({ status: false, message: "Sizes should be among [XS, S, M, L, XL, XXL]" })
@@ -135,24 +140,24 @@ const createProduct = async function (req, res) {
 const getProduct = async function (req, res) {
     try {
         let data = req.query
-        
+
         let filter = { isDeleted: false }
 
         if (data.name) {
             if (!isValid(data.name)) {
                 return res.status(400).send({ status: false, message: "Please enter valid name for filter." })
             }
-            filter.title ={'$regex':data.name,"$options":"$i"}
-            
+            filter.title = { '$regex': data.name, "$options": "$i" }
+
         }
 
         if (data.size) {
             data.size = data.size.toUpperCase()
-            for(let i in data.size){
-                data.size[i]=data.size[i].trim()
+            for (let i in data.size) {
+                data.size[i] = data.size[i].trim()
             }
             data.size = data.size.split(",")
-        
+
             if (!isValidSize(data.size)) {
                 return res.status(400).send({ status: false, message: "Sizes should be among [XS, S, M, L, XL, XXL]" })
             }
@@ -305,8 +310,8 @@ const updateProductDetails = async function (req, res) {
                 return res.status(400).send({ status: false, msg: "Enter availableSizes" });
             availableSizes = availableSizes.toUpperCase()
             availableSizes = availableSizes.split(",")
-            for(let i in availableSizes){
-                availableSizes[i]=availableSizes[i].trim()
+            for (let i in availableSizes) {
+                availableSizes[i] = availableSizes[i].trim()
             }
             if (!isValidSize(availableSizes)) {
                 return res.status(400).send({ status: false, message: "Sizes should be among [XS, S, M, L, XL, XXL]" })
@@ -316,7 +321,7 @@ const updateProductDetails = async function (req, res) {
         if (installments) {
             if (!(isValid(installments) && isValidNumberInt(installments)))
                 return res.status(400).send({ status: false, msg: "Enter valid number in installments" });
-            obj["$push"]={installments:installments}
+            obj["$push"] = { installments: installments }
         };
 
         if (files && files.length > 0) {
