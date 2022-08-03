@@ -183,9 +183,9 @@ const createCart = async function (req, res) {
 
         // Authorization
 
-        // if (req.loginId != userIdbyParams) {
-        //     return res.status(403).send({ status: false, message: "Unauthorize user" })
-        // }
+        if (req.loginId != userIdbyParams) {
+            return res.status(403).send({ status: false, message: "Unauthorize user" })
+        }
 
         // For productId
 
@@ -216,7 +216,8 @@ const createCart = async function (req, res) {
             if (isProductPresentInCart.includes(productId)) {
 
                 const updateExistingProductQuantity = await cartModel.findOneAndUpdate({ _id: cartIdpresent._id, "items.productId": productId },
-                    { $inc: { totalPrice: +isProductPresent.price, "items.$.quantity": +1, } }, { new: true }).populate([{ path: "items.productId" }])
+                    { $inc: { totalPrice: +isProductPresent.price, "items.$.quantity": +1, } }, { new: true })
+                    //.populate([{ path: "items.productId" }])
 
         
                 return res.status(200).send({ status: true, message: "Product quantity updated to cart", data: updateExistingProductQuantity });
@@ -225,7 +226,7 @@ const createCart = async function (req, res) {
                 const addNewProductInItems = await cartModel.findOneAndUpdate(
                     { _id: cartIdpresent._id },
                     {
-                        $addToSet: { items: { productId: cartIdpresent, quantity: 1 } },
+                        $addToSet: { items: { productId: productId, quantity: 1 } },
                         $inc: { totalItems: +1, totalPrice: +isProductPresent.price },
                     },
                     { new: true }).populate([{ path: "items.productId" }]);
