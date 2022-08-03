@@ -16,16 +16,16 @@ const createOrder = async function (req, res) {
         }
         //-------------------------------------checking Authorizaton------------------------->>
         if (req.loginId != userId) {
-            return res.status(403).send({ status: false, message: "User logged is not allowed to delete the cart details" })
+            return res.status(403).send({ status: false, message: "User logged is not allowed to place the order" })
         }
 
         if (!isValidRequest(req.body)) {
-            return res.status(400).send({ status: false, message: "Invalid request.Please provide details to create cart" })
+            return res.status(400).send({ status: false, message: "Invalid request.Please provide details to place" })
         }
         let { cartId, status, cancellable } = req.body
         //validating cartId
         if (!isValid(cartId)) {
-            return res.status(400).send({ status: false, message: "CartId is required to update cartDetails" })
+            return res.status(400).send({ status: false, message: "CartId is required to place order" })
         }
         if (!isValidObjectId(cartId)) {
             return res.status(400).send({ status: false, message: "Invalid cartid" })
@@ -36,7 +36,7 @@ const createOrder = async function (req, res) {
         }
         if(status){
             if (!isValid(status)) {
-                return res.status(400).send({ status: false, message: "status is required" })
+                return res.status(400).send({ status: false, message: "please send some valid input for status" })
             }
             if (!isValidStatus(status)) {
                 return res.status(400).send({ status: false, message: "status should be among [pending, completed, cancled] " })
@@ -44,15 +44,15 @@ const createOrder = async function (req, res) {
         }
         else
         status="pending"
-
+         
         if(cancellable)
         {
             if (typeof (cancellable) !== "boolean") {
-                return res.status(400).send({ status: false, message: "cancellable is required and can be either true or false" })
+                return res.status(400).send({ status: false, message: "value of cancellable can be either true or false" })
             }
         }
         else
-        cancellable=false
+        cancellable=true
 
         let qty = 0
         for (let i in isCartExist.items) {
