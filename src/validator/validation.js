@@ -88,9 +88,11 @@ const isValidNumber = function (value) {
   return (!(isNaN(Number(value))))
 }
 
+
 const isValidStatus=function (status){
   return(["pending", "completed", "cancled"].indexOf(status)!=-1)
 }
+
 
 module.exports = {
   isValid, validName, isValidMail, isValidRequest,
