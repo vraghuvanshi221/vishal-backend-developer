@@ -217,7 +217,7 @@ const updateUserDetails = async (req, res) => {
             return res.status(400).send({ status: false, msg: "Please provide a valid userId" });
         }
 
-        //===================================checking Authorization==================================
+        //==============================checking Authorization===================
         if (req.loginId != userId) {
             return res.status(403).send({ status: false, message: "User logged is not allowed to update the profile details" })
         }
