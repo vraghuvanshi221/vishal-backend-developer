@@ -128,7 +128,7 @@ const deleteCart = async function (req, res) {
             return res.status(403).send({ status: false, message: "User logged is not allowed to delete the cart details" })
         }
         let update = {
-            $pull: {items:"items"},
+            $set: {items:[]},
             totalPrice: 0,
             totalItems: 0
         }
@@ -281,13 +281,14 @@ const getCart = async (req, res) => {
         let checkUserId = await userModel.findById(userId);
         if (!checkUserId) return res.status(404).send({ status: false, msg: "userId doesn't exits" });
 
-        // if(userId!=req.loginId) return res.status(403).send({status:false,msg:"unauthorized user"});
-
-        let cart = await cartModel.findOne({ userId: userId });
-        if (cart == null) return res.status(404).send({ status: false, msg: "cart not available" });
-
-        return res.status(200).send({ status: true, msg: "cart found", data: cart });
-
+        //======================checking Authorization============================
+        if(userId!=req.loginId) return res.status(403).send({status:false,msg:"unauthorized user"});
+    
+        let cart = await cartModel.findOne({userId:userId});
+        if(cart==null)return res.status(404).send({status:false,msg:"cart not available"});
+       
+            return res.status(200).send({status:true,msg:"cart summery",data:cart});
+        
 
     }
     catch (err) {
