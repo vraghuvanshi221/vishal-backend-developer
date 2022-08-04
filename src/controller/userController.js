@@ -18,7 +18,8 @@ const registerUser = async function (req, res) {
         let files = req.files
         let { fname, lname, email, phone, password } = userDetails
 
-        let address = req.body.address
+        let address = JSON.parse(req.body.address)
+
         let { shipping, billing } = address
 
         if (!isValidRequest(userDetails)) {
@@ -44,7 +45,7 @@ const registerUser = async function (req, res) {
         }
         let mailCheck = await userModel.findOne({ email })
         if (mailCheck) {
-            return res.status(409).send({ status: false, msg: `${email} already registered, try new.` })
+            return res.status(400).send({ status: false, msg: `${email} already registered, try new.` })
         }
         if (files.length == 0) {
             return res.status(400).send({ status: false, msg: "Please upload profile image for registration." })
@@ -60,7 +61,7 @@ const registerUser = async function (req, res) {
         }
         let phoneCheck = await userModel.findOne({ phone })
         if (phoneCheck) {
-            return res.status(409).send({ status: false, msg: `${phone} already registered, try new.` })
+            return res.status(400).send({ status: false, msg: `${phone} already registered, try new.` })
         }
         if (!password) {
             return res.status(400).send({ status: false, msg: "Please enter a strong password for registration." })
@@ -78,6 +79,9 @@ const registerUser = async function (req, res) {
             if (!address) {
                 return res.status(400).send({ status: false, msg: "Please enter address for shipping and billing purpose." })
             }
+        if (!shipping) {
+            return res.status(400).send({ status: false, msg: "please enter shipping." });
+        }
         if (!isValid(shipping.street)) {
             return res.status(400).send({ status: false, msg: "please enter street for shipping." });
         }
@@ -93,6 +97,9 @@ const registerUser = async function (req, res) {
         }
         if (!isValidPin(shipping.pincode)) {
             return res.status(400).send({ status: false, msg: `${shipping.pincode} is not a valid pincode.` })
+        }
+        if (!billing) {
+            return res.status(400).send({ status: false, msg: "please enter billing address." });
         }
         if (!isValid(billing.street)) {
             return res.status(400).send({ status: false, msg: "Please enter street for billing." });
@@ -153,7 +160,7 @@ const userLogin = async function (req, res) {
 
         const loginUser = await userModel.findOne({ email: email })
         if (!loginUser) {
-            return res.status(401).send({ status: false, message: "Incorrect Email" })
+            return res.status(401).send({ status: false, message: "Not register email-id" })
         }
 
         let hashedpass = loginUser.password
@@ -169,7 +176,7 @@ const userLogin = async function (req, res) {
             }, "pro@3", { expiresIn: '10h' }
         )
         res.setHeader("x-api-key", token)
-        let dataToBeSend = { usedId: loginUser._id, token: token }
+        let dataToBeSend = { usedId: loginUser._id, token: { token } }
         res.status(200).send({ status: true, message: 'User login successfull', data: dataToBeSend })
 
     }
@@ -186,7 +193,7 @@ const getUser = async function (req, res) {
     try {
         let userId = req.params.userId
         if (!isValidObjectId(userId)) {
-            return res.status(400).send({ status: false, message: "Invalid object id" })
+            return res.status(400).send({ status: false, message: "Invalid user id" })
         }
         //-------------------------------------checking Authorizaton------------------------->>
         if (req.loginId != userId) {
@@ -229,11 +236,10 @@ const updateUserDetails = async (req, res) => {
         }
 
         let data = req.body
-        let file = req.files
         let address = data.address
-        console.log(file)
-        if ((Object.keys(data).length == 0) && (!isValid(file))) {
-            return res.status(400).send({ status: 400, msg: "Invalid request" });
+
+        if ((Object.keys(data).length == 0) && (!isValid(req.files))) {
+            return res.status(400).send({ status: false, msg: "Invalid request" });
         }
 
 
@@ -294,6 +300,7 @@ const updateUserDetails = async (req, res) => {
         }
 
         if (address) {
+            address = JSON.parse(address)
 
             if (address.shipping) {
                 if (address.shipping.street) {
@@ -363,22 +370,36 @@ const updateUserDetails = async (req, res) => {
         }
 
 
-        if (file) {
+        /// error 
+        file = req.files
+       
 
-            if (file && file.length > 0) {
-                const userImage = await uploadFile(file[0])
-                obj.profileImage = userImage
-            }
-            else {
-                return res.status(400).send({ status: false, message: "please provide profile image" })
-            }
+        if (file.length>0) {
+
+            const userImage = await uploadFile(file[0])
+            obj.profileImage = userImage
+
         }
+
+
+
+
+        // if (req.files.length > 0) {
+        //     console.log(file)
+        //     const userImage = await uploadFile(file[0])
+        //     if(!(userImage))
+        //     return res.status(400).send({ status: false, Message: "No data in profile image" })
+        //     else
+        //     obj.profileImage = userImage
+
+        // }
+
 
 
 
         let updateProfileDetails = await userModel.findOneAndUpdate({ _id: userId }, { $set: obj }, { new: true })
 
-        return res.status(200).send({ status: true, message: "User Update Successfully !!", data: updateProfileDetails })
+        return res.status(200).send({ status: true, message: "Update user profile is successful", data: updateProfileDetails })
     }
     catch (err) {
         console.log(err)

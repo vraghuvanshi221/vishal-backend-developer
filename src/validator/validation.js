@@ -60,7 +60,7 @@ const isValidSize = function (size) {
 
   let flag = 0
   for (x in size) {
-    let ret = ["XS", "S", "M", "L", "XL", "XXL"].indexOf(size[x]) != -1
+    let ret = ["S", "XS","M","X", "L","XXL", "XL"].indexOf(size[x]) != -1
     if (!ret) {
       flag = 1
       break

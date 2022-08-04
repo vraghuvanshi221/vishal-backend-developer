@@ -125,7 +125,7 @@ const createProduct = async function (req, res) {
         }
 
         const newProduct = await productModel.create(newProductDetail)
-        res.status(201).send({ status: true, message: "Product created successfully", data: newProduct })
+        res.status(201).send({ status: true, message: "Product creation has a successful", data: newProduct })
 
     }
     catch (err) {
@@ -249,7 +249,7 @@ const updateProductDetails = async function (req, res) {
         let files = req.files
 
         if ((Object.keys(data).length == 0) && (!isValid(files))) {
-            return res.status(400).send({ status: 400, msg: "Please enter product details for updation." });
+            return res.status(400).send({ status: false, msg: "Please enter product details for updation." });
         }
         let { title, description, price, currencyId, currencyFormat, isFreeShipping, style, availableSizes, installments } = data;
         let obj = {}
