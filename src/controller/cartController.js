@@ -213,10 +213,14 @@ const createCart = async function (req, res) {
             if (isProductPresentInCart.includes(productId)) {
 
                 const updateExistingProductQuantity = await cartModel.findOneAndUpdate({ _id: cartIdpresent._id, "items.productId": productId },
-                    { $inc: { totalPrice: +isProductPresent.price, "items.$.quantity": +1, } }, { new: true }).populate([{ path: "items.productId" }])
+                    { $inc: { totalPrice: +isProductPresent.price, "items.$.quantity": +1, } }, { new: true }).populate([{ path: "items.productId" }]);
+
+                    let {_id,title,price,productImage}=updateExistingProductQuantity
+
+                    let product={_id,title,price,productImage}
 
         
-                return res.status(200).send({ status: true, message: "Product quantity updated to cart", data: updateExistingProductQuantity });
+                return res.status(200).send({ status: true, message: "Product quantity updated to cart", data: product });
             }
             else {
                 const addNewProductInItems = await cartModel.findOneAndUpdate(
