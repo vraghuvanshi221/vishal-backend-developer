@@ -32,7 +32,7 @@ const createOrder = async function (req, res) {
             return res.status(400).send({ status: false, message: "Invalid cartid" })
         }
         let isCartExist = await cartModel.findOne({ _id: cartId })
-        if (!isCartExist) {
+        if (isCartExist==null) {
             return res.status(404).send({ status: false, message: "No cart with this Id found" })
         }
         if (status) {
