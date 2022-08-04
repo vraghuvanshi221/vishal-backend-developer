@@ -115,8 +115,12 @@ const updateOrder = async function (req, res) {
             return res.status(400).send({ status: false, msg: "We can't proccess this request, because this status is invalid." })
         }
 
+        if(checkOrder.status === "completed"){
+            return res.status(400).send({status: false, msg: "We can't process this request, as this order is completed."})
+        }
+
         if(status=== "cancled"){
-            let { cancellable, ...rest } = checkOrder
+            let { cancellable,...rest } = checkOrder
             if (cancellable == false) {
                 return res.status(400).send({ status: false, msg: "This product can not be cancled." })
             }
