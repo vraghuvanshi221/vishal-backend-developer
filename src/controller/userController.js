@@ -18,7 +18,7 @@ const registerUser = async function (req, res) {
         let files = req.files
         let { fname, lname, email, phone, password } = userDetails
 
-        let address =JSON.parse(req.body.address)
+        let address = req.body.address
         let { shipping, billing } = address
 
         if (!isValidRequest(userDetails)) {
