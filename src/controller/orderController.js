@@ -34,12 +34,16 @@ const createOrder = async function (req, res) {
         if (!isCartExist) {
             return res.status(404).send({ status: false, message: "No cart with this Id found" })
         }
+
+        if(isCartExist.items.length==0){
+            return res.status(404).send({ status: false, message: "No product present in the cart to place order" })  
+        }
         if(status){
             if (!isValid(status)) {
                 return res.status(400).send({ status: false, message: "please send some valid input for status" })
             }
-            if (!isValidStatus(status)) {
-                return res.status(400).send({ status: false, message: "status should be among [pending, completed, cancled] " })
+            if (status!=="pending") {
+                return res.status(400).send({ status: false, message: "while placing order status should be pending" })
             }
         }
         else
@@ -69,6 +73,16 @@ const createOrder = async function (req, res) {
             cancellable: cancellable
         }
         let newOrder = await orderModel.create(orderDetils)
+
+        let update = {
+            $set: {items:[]},
+            totalPrice: 0,
+            totalItems: 0
+        }
+        let deletetedCart = await cartModel.findOneAndUpdate({ userId: userId }, update, { new: true })
+        if (!deletetedCart) {
+            return res.status(404).send({ status: false, message: "cart for this user id not found" })
+        }
         res.status(201).send({ status: true, message: "order Placed", data: newOrder })
 
     }

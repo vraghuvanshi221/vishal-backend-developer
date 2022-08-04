@@ -89,7 +89,7 @@ const isValidNumber = function (value) {
 }
 
 const isValidStatus=function (status){
-  return(["pending", "completed", "cancled"].indexOf(status)!=-1)
+  return(["pending", "completed", "cancelled"].indexOf(status)!=-1)
 }
 
 module.exports = {
