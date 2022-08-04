@@ -16,9 +16,9 @@ const registerUser = async function (req, res) {
     try {
         let userDetails = req.body
         let files = req.files
-        let { fname, lname, email, phone, password, address } = userDetails
+        let { fname, lname, email, phone, password } = userDetails
 
-        //let address =JSON.parse(req.body.address)
+        let address = req.body.address
         let { shipping, billing } = address
 
         if (!isValidRequest(userDetails)) {
@@ -217,7 +217,7 @@ const updateUserDetails = async (req, res) => {
             return res.status(400).send({ status: false, msg: "Please provide a valid userId" });
         }
 
-        //===================================checking Authorization==================================
+        //==============================checking Authorization===================
         if (req.loginId != userId) {
             return res.status(403).send({ status: false, message: "User logged is not allowed to update the profile details" })
         }
