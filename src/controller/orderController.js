@@ -21,7 +21,7 @@ const createOrder = async function (req, res) {
         }
 
         if (!isValidRequest(req.body)) {
-            return res.status(400).send({ status: false, message: "Invalid request.Please provide details to place" })
+            return res.status(400).send({ status: false, message: "Invalid request.Please provide details to place the order" })
         
         }
 
@@ -35,8 +35,15 @@ const createOrder = async function (req, res) {
             return res.status(400).send({ status: false, message: "Invalid cartid" })
         }
         let isCartExist = await cartModel.findOne({ _id: cartId })
+
         if (isCartExist==null) {
             return res.status(404).send({ status: false, message: "No cart with this Id found" })
+        }
+  
+        //Checking Authorizaton
+
+        if(userId!=isCartExist.userId){
+            return res.status(403).send({ status: false, message: "This cart does'nt belong to user logged In" }) 
         }
 
         if(isCartExist.items.length==0){
@@ -84,9 +91,7 @@ const createOrder = async function (req, res) {
             totalItems: 0
         }
         let deletetedCart = await cartModel.findOneAndUpdate({ userId: userId }, update, { new: true })
-        if (!deletetedCart) {
-            return res.status(404).send({ status: false, message: "cart for this user id not found" })
-        }
+        
         res.status(201).send({ status: true, message: "order Placed", data: newOrder })
 
     }
@@ -100,15 +105,25 @@ const updateOrder = async function (req, res) {
         let userId = req.params.userId
         let orderDetails = req.body
         let { orderId, status } = orderDetails
-
         if (!mongoose.isValidObjectId(userId)) {
             return res.status(400).send({ status: false, msg: "Please enter valid user id." })
+        }
+
+
+        let userExist = await userModel.findOne({ _id: userId })
+        if (userExist === null) {
+            return res.status(400).send({ status: false, msg: "This user is not registered on our platform." })
         }
 
         //================================================Checking Authorizaton================================================//
 
         if (req.loginId != userId) {
             return res.status(403).send({ status: false, message: "User logged is not allowed to update this order." })
+        }
+
+        let isCartExist = await cartModel.findOne({ userId: userId })
+        if (!isCartExist) {
+            return res.status(404).send({ status: false, message: "No cart found for this user." })
         }
 
         if (!orderId) {
@@ -119,15 +134,11 @@ const updateOrder = async function (req, res) {
             return res.status(400).send({ status: false, msg: "Please enter valid order." })
         }
 
-        let userExist = await userModel.findOne({ _id: userId })
-        if (userExist === null) {
-            return res.status(400).send({ status: false, msg: "This user is not registered on our platform." })
-        }
-
         let checkOrder = await orderModel.findOne({ _id: orderId })
         if (userId != checkOrder.userId) {
             return res.status(400).send({ status: false, msg: "This order doesn't belong to this user." })
         }
+        // console.log("all ok")
 
         if (!status) {
             return res.status(400).send({ status: false, msg: "Please enter details for order updation." })
@@ -136,12 +147,17 @@ const updateOrder = async function (req, res) {
             return res.status(400).send({ status: false, msg: "We can't proccess this request, because this status is invalid." })
         }
 
-        if(checkOrder.status === "completed"){
-            return res.status(400).send({status: false, msg: "We can't process this request, as this order is completed."})
+        if (checkOrder.status === "completed") {
+            return res.status(400).send({ status: false, msg: "We can't process this request, as this order is completed." })
         }
 
-        if(status=== "cancelled"){
-            let { cancellable,...rest } = checkOrder
+        if (checkOrder.status === "cancelled") {
+            return res.status(400).send({ status: false, msg: "We can't process this request, as this order is cancelled." })
+        }
+
+
+        if (status === "cancelled") {
+            let { cancellable, ...rest } = checkOrder
             if (cancellable == false) {
                 return res.status(400).send({ status: false, msg: "This product can not be cancelled." })
             }

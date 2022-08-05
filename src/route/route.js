@@ -13,7 +13,7 @@ const { authentication } = require("../middleware/auth")
 router.post('/register', registerUser)
 router.post("/login", userLogin)
 router.get("/user/:userId/profile", authentication, getUser)
-router.put("/user/:userId/profile", authentication, updateUserDetails)
+router.put("/user/:userId/profile",  updateUserDetails)
 
 // ******************************* PRODUCT APIS **********************************
 

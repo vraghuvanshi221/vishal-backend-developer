@@ -26,8 +26,8 @@ const createCart = async function (req, res) {
 
         // For userId from params
 
-        // if (!userIdbyParams)
-        //     return res.status(400).send({ status: false, message: "Enter userId" })
+        if (!userIdbyParams)
+            return res.status(400).send({ status: false, message: "Enter userId" })
 
         if (!isValidObjectId(userIdbyParams)) {
             return res.status(400).send({ status: false, message: 'Please provide valid userId in Params' })
@@ -103,7 +103,7 @@ const createCart = async function (req, res) {
 
         }
         else {
-
+            // if (isCartPresentForUser == null){}   Need to be work 
 
             const productData =
             {
@@ -212,7 +212,7 @@ const updateCart = async function (req, res) {
             if (!productExistInCart) {
                 return res.status(404).send({ status: false, message: "No Product with this Id found in this Cart for current user" })
             }
-            productExistInCart["_doc"]["productdetails"] = productExist
+            productExistInCart["_doc"]["productRemoved"] = productExist
             return res.status(200).send({ status: true, message: "Success", data: productExistInCart })
         }
         if (removeProduct == 1) {
@@ -229,7 +229,7 @@ const updateCart = async function (req, res) {
                 return res.status(404).send({ status: false, message: "No Product with this Id found in this Cart for current user" })
             }
 
-            productExistInCart["_doc"]["productdetails"] = productExist
+            productExistInCart["_doc"]["quantity decremented of the product"] = productExist
             res.status(200).send({ status: true, message: "Success", data: productExistInCart })
 
         }
@@ -259,7 +259,7 @@ const getCart = async (req, res) => {
         let cart = await cartModel.findOne({ userId: userId });
         if (cart == null) return res.status(404).send({ status: false, msg: "cart not available" });
 
-        return res.status(200).send({ status: true, msg: "cart summery", data: cart });
+        return res.status(200).send({ status: true, message: "Success", data: cart });
 
 
     }
@@ -287,6 +287,7 @@ const deleteCart = async function (req, res) {
         if (req.loginId != userId) {
             return res.status(403).send({ status: false, message: "User logged is not allowed to delete the cart details" })
         }
+        
         let update = {
             $set: { items: [] },
             totalPrice: 0,

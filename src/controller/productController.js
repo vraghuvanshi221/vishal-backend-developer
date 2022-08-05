@@ -248,7 +248,7 @@ const updateProductDetails = async function (req, res) {
         let data = req.body
         let files = req.files
 
-        if ((Object.keys(data).length == 0) && (!isValid(files))) {
+        if ((Object.keys(data).length == 0) && (req.files == undefined)) {
             return res.status(400).send({ status: false, msg: "Please enter product details for updation." });
         }
         let { title, description, price, currencyId, currencyFormat, isFreeShipping, style, availableSizes, installments } = data;

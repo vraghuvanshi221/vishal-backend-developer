@@ -238,7 +238,7 @@ const updateUserDetails = async (req, res) => {
         let data = req.body
         let address = data.address
 
-        if ((Object.keys(data).length == 0) && (!isValid(req.files))) {
+        if ((Object.keys(data).length == 0) && (req.files == undefined)) {
             return res.status(400).send({ status: false, msg: "Invalid request" });
         }
 
@@ -373,13 +373,14 @@ const updateUserDetails = async (req, res) => {
         /// error 
         file = req.files
        
-
         if (file.length>0) {
 
             const userImage = await uploadFile(file[0])
             obj.profileImage = userImage
 
         }
+
+
 
 
 
