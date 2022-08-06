@@ -70,9 +70,11 @@ const createCart = async function (req, res) {
                 return res.status(400).send({ status: false, message: 'Input cartId in body is optional. If you want to input the cartId then plz enter the right one. Now you input a wrong cartId.' })
             }
         }
+
         if(isCartPresentForUser!=null && !cartId){
             return res.status(400).send({ status: false, message: 'This user own a cart so kindly input cartId in body.' })
         }
+        
         if (isCartPresentForUser != null) {
 
             cartIdpresent = isCartPresentForUser
@@ -106,8 +108,6 @@ const createCart = async function (req, res) {
 
         }
         else {
-            // if (isCartPresentForUser == null){}   Need to be work 
-
             const productData =
             {
                 productId: productId,
