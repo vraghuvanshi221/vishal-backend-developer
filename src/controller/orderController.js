@@ -63,7 +63,7 @@ const createOrder = async function (req, res) {
         if(cancellable)
         {
             if (typeof (cancellable) !== "boolean") {
-                return res.status(400).send({ status: false, message: "value of cancellable can be either true or false" })
+                return res.status(400).send({ status: false, message: "value of cancellable can be either boolean true or false" })
             }
         }
         else
@@ -111,8 +111,9 @@ const updateOrder = async function (req, res) {
 
 
         let userExist = await userModel.findOne({ _id: userId })
-        if (userExist === null) {
-            return res.status(400).send({ status: false, msg: "This user is not registered on our platform." })
+        if (userExist === null) 
+        {
+            return res.status(404).send({ status: false, msg: "This user is not registered on our platform." })
         }
 
         //================================================Checking Authorizaton================================================//
@@ -135,13 +136,18 @@ const updateOrder = async function (req, res) {
         }
 
         let checkOrder = await orderModel.findOne({ _id: orderId })
+        if (checkOrder === null) 
+        {
+            return res.status(404).send({ status: false, msg: "no order with this Id found" })
+        }
+        
         if (userId != checkOrder.userId) {
-            return res.status(400).send({ status: false, msg: "This order doesn't belong to this user." })
+            return res.status(403).send({ status: false, msg: "This order doesn't belong to this user." })
         }
         // console.log("all ok")
 
         if (!status) {
-            return res.status(400).send({ status: false, msg: "Please enter details for order updation." })
+            return res.status(400).send({ status: false, msg: "Please enter status details for order updation." })
         }
         if (!isValidStatus(status)) {
             return res.status(400).send({ status: false, msg: "We can't proccess this request, because this status is invalid." })
