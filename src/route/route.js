@@ -13,14 +13,14 @@ const { authentication } = require("../middleware/auth")
 router.post('/register', registerUser)
 router.post("/login", userLogin)
 router.get("/user/:userId/profile", authentication, getUser)
-router.put("/user/:userId/profile",  updateUserDetails)
+router.put("/user/:userId/profile",  authentication, updateUserDetails)
 
 // ******************************* PRODUCT APIS **********************************
 
 router.post("/products", createProduct);
 router.get("/products", getProduct)
 router.get("/products/:productId", getProductsById);
-router.put("/products/:productId", updateProductDetails);
+router.put("/products/:productId",updateProductDetails);
 router.delete("/products/:productId", deleteProductById);
 
 // ****************************** Cart APIs ***************************
