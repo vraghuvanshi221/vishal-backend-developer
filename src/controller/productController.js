@@ -5,7 +5,7 @@ const { isValid,
     removeExtraSpace,
     isValidSize,
     validName,
-    isValidNumberInt, isValidNumber, isValidTitle,isValidImage } = require("../validator/validation")
+    isValidNumberInt, isValidNumber,isValidImage } = require("../validator/validation")
 const { uploadFile } = require("../AWS/aws")
 
 
@@ -13,12 +13,13 @@ const { uploadFile } = require("../AWS/aws")
 
 const createProduct = async function (req, res) {
     try {
-        const files = req.files
-
-        let productDetails = req.body
+       
         if (!isValidRequest(req.body)) {
             return res.status(400).send({ status: false, message: "Please enter details for product listing." })
         }
+        const files = req.files
+
+        let productDetails = req.body
         // const data = JSON.parse(req.body.data)
         //extracting params form request body
         let { title, description, price, currencyId, currencyFormat, isFreeShipping, style, availableSizes, installments } = productDetails
@@ -164,7 +165,7 @@ const getProduct = async function (req, res) {
             data.size = data.size.split(",")
 
             if (!isValidSize(data.size)) {
-                return res.status(400).send({ status: false, message: "Sizes should be among [XS, S, M, L, XL, XXL]" })
+                return res.status(400).send({ status: false, message: "Sizes should be among [XS,X, S, M, L, XL, XXL]" })
             }
 
             filter.availableSizes = { '$in': data.size }
@@ -193,12 +194,15 @@ const getProduct = async function (req, res) {
             }
             filter.price = { '$lt': data.priceLessThan }
         }
-
+        
+        let priceSort=1
         if (data.priceSort) {
+          
+            if(!(data.priceSort==1||data.priceSort==-1)){
+                return res.status(400).send({ status: false, message: "value of price sort can be 1(ascending) or -1(descending)" })     
+            }
             priceSort = data.priceSort
-        } else {
-            priceSort = 1
-        }
+        } 
 
         const product = await productModel.find(filter).sort({ price: priceSort });
 

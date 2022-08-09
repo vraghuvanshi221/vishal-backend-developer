@@ -6,7 +6,7 @@ const { isValid, isValidObjectId,
     validName, isValidMail,
     isValidMobile, isValidRequest,
     isValidPassword, isValidStreet,
-    isValidCity, isValidPin } = require("../validator/validation")
+    isValidCity, isValidPin ,isValidImage} = require("../validator/validation")
 
 
 
@@ -16,11 +16,9 @@ const registerUser = async function (req, res) {
     try {
         let userDetails = req.body
         let files = req.files
-        let { fname, lname, email, phone, password } = userDetails
+        let { fname, lname, email, phone, password ,address} = userDetails
 
-        let address = JSON.parse(req.body.address)
-
-        let { shipping, billing } = address
+        
 
         if (!isValidRequest(userDetails)) {
             return res.status(400).send({ status: false, msg: "Please enter details for user registration." })
@@ -47,15 +45,7 @@ const registerUser = async function (req, res) {
         if (mailCheck) {
             return res.status(400).send({ status: false, msg: `${email} already registered, try new.` })
         }
-        if (files.length == 0) {
-            return res.status(400).send({ status: false, msg: "Please upload profile image for registration." })
-        }
-        if (files.length > 0) {
-            if(!isValidImage(files[0].mimetype)){
-                return res.status(400).send({ status: false, message: "file should be an image file" }) 
-           }
-            var uploadedFileURL = await uploadFile(files[0])
-        }
+        
         if (!phone) {
             return res.status(400).send({ status: false, msg: "Please enter phone number for registration" })
         }
@@ -78,10 +68,13 @@ const registerUser = async function (req, res) {
             password = newPassword
         }
 
-        if (address && typeof (address) == {})
-            if (!address) {
+        
+            if (!isValid(address)) {
                 return res.status(400).send({ status: false, msg: "Please enter address for shipping and billing purpose." })
             }
+            address = JSON.parse(address)
+
+            let { shipping, billing } = address
         if (!shipping) {
             return res.status(400).send({ status: false, msg: "please enter shipping." });
         }
@@ -120,10 +113,17 @@ const registerUser = async function (req, res) {
             return res.status(400).send({ status: false, msg: `${billing.pincode} is not a valid pincode.` })
         }
 
-        let profileImage = uploadedFileURL
-        if (!profileImage) {
-            return res.status(400).send({ status: false, msg: "don't leave upload files attribute, upload valid files" });
+        if (files.length == 0) {
+            return res.status(400).send({ status: false, msg: "Please upload profile image for registration." })
         }
+        if (files.length > 0) {
+            if(!isValidImage(files[0].mimetype)){
+                return res.status(400).send({ status: false, message: "file should be an image file" }) 
+           }
+            var uploadedFileURL = await uploadFile(files[0])
+        }
+        let profileImage = uploadedFileURL
+       
         let responseBody = { fname, lname, email, profileImage, phone, password, address }
         let createUser = await userModel.create(responseBody)
         return res.status(201).send({ status: true, message: "User created successfully.", data: createUser })
@@ -179,7 +179,7 @@ const userLogin = async function (req, res) {
             }, "pro@3", { expiresIn: '10h' }
         )
         res.setHeader("x-api-key", token)
-        let dataToBeSend = { usedId: loginUser._id, token: { token } }
+        let dataToBeSend = { usedId: loginUser._id, token  }
         res.status(200).send({ status: true, message: 'User login successfull', data: dataToBeSend })
 
     }
@@ -198,7 +198,7 @@ const getUser = async function (req, res) {
         if (!isValidObjectId(userId)) {
             return res.status(400).send({ status: false, message: "Invalid user id" })
         }
-        let userDetails = await userModel.findById(userId)
+        let userDetails = await userModel.findOne({_id:userId},{password:0})
         if (!userDetails) {
             return res.status(404).send({ status: false, message: "user not found" })
         }
@@ -307,6 +307,9 @@ const updateUserDetails = async (req, res) => {
         if (address) {
             address = JSON.parse(address)
 
+            if(Object.keys(address).length==0){
+                return res.status(400).send({ status: false, msg: "please send data in address to update" });
+            }
             if (address.shipping) {
                 if (address.shipping.street) {
                     if (!isValidStreet(address.shipping.street)) {
@@ -387,30 +390,12 @@ const updateUserDetails = async (req, res) => {
 
         }
 
-
-
-
-
-
-        // if (req.files.length > 0) {
-        //     console.log(file)
-        //     const userImage = await uploadFile(file[0])
-        //     if(!(userImage))
-        //     return res.status(400).send({ status: false, Message: "No data in profile image" })
-        //     else
-        //     obj.profileImage = userImage
-
-        // }
-
-
-
-
-        let updateProfileDetails = await userModel.findOneAndUpdate({ _id: userId }, { $set: obj }, { new: true })
+let updateProfileDetails = await (await userModel.findOneAndUpdate({ _id: userId }, { $set: obj }, { new: true }))
 
         return res.status(200).send({ status: true, message: "Update user profile is successful", data: updateProfileDetails })
     }
     catch (err) {
-        console.log(err)
+    
         return res.status(500).send({ status: false, error: err.message })
     }
 };

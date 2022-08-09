@@ -144,7 +144,7 @@ const updateOrder = async function (req, res) {
         if (userId != checkOrder.userId) {
             return res.status(403).send({ status: false, msg: "This order doesn't belong to this user." })
         }
-        // console.log("all ok")
+        
 
         if (!status) {
             return res.status(400).send({ status: false, msg: "Please enter status details for order updation." })
@@ -169,7 +169,8 @@ const updateOrder = async function (req, res) {
             }
         }
 
-        const updateOrderStatus = await orderModel.findByIdAndUpdate({ _id: orderId }, orderDetails, { new: true })
+        
+        const updateOrderStatus = await orderModel.findByIdAndUpdate({ _id: orderId },{$set:{status:status}}, { new: true })
         return res.status(200).send({ status: true, msg: "Order status updated successfully.", data: updateOrderStatus })
 
     } catch (err) {
