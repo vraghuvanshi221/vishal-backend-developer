@@ -93,9 +93,18 @@ const isValidStatus=function (status){
   return(["pending", "completed", "cancelled"].indexOf(status)!=-1)
 }
 
+const isValidImage = function (mimetype) {
+  
+if(mimetype=='image/png'||mimetype=='image/jpg'||mimetype=='image/jpeg'||mimetype=='image/gif'||mimetype=='image/tiff')
+return true
+else
+return false
+
+}
+
 
 module.exports = {
   isValid, validName, isValidMail, isValidRequest,
   isValidMobile, isValidPassword, isValidStreet, isValidCity, isValidPin, isValidObjectId, removeExtraSpace,
-  isValidSize, isValidNumberInt, isValidNumber,isValidStatus,
+  isValidSize, isValidNumberInt, isValidNumber,isValidStatus,isValidImage
 }

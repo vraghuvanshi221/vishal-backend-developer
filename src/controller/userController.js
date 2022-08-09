@@ -51,6 +51,9 @@ const registerUser = async function (req, res) {
             return res.status(400).send({ status: false, msg: "Please upload profile image for registration." })
         }
         if (files.length > 0) {
+            if(!isValidImage(files[0].mimetype)){
+                return res.status(400).send({ status: false, message: "file should be an image file" }) 
+           }
             var uploadedFileURL = await uploadFile(files[0])
         }
         if (!phone) {
@@ -195,14 +198,15 @@ const getUser = async function (req, res) {
         if (!isValidObjectId(userId)) {
             return res.status(400).send({ status: false, message: "Invalid user id" })
         }
-        //-------------------------------------checking Authorizaton------------------------->>
-        if (req.loginId != userId) {
-            return res.status(403).send({ status: false, message: "User logged is not allowed to view the profile details" })
-        }
         let userDetails = await userModel.findById(userId)
         if (!userDetails) {
             return res.status(404).send({ status: false, message: "user not found" })
         }
+        //-------------------------------------checking Authorizaton------------------------->>
+        if (req.loginId != userId) {
+            return res.status(403).send({ status: false, message: "User logged is not allowed to view the profile details" })
+        }
+       
         res.status(200).send({ status: true, message: "User profile details", data: userDetails })
 
     }
@@ -224,16 +228,17 @@ const updateUserDetails = async (req, res) => {
             return res.status(400).send({ status: false, msg: "Please provide a valid userId" });
         }
 
+        
+        const findUserData = await userModel.findById(userId)
+        if (!findUserData) {
+            return res.status(404).send({ status: false, message: "user not found" })
+        }
         //==============================checking Authorization===================
         if (req.loginId != userId) {
             return res.status(403).send({ status: false, message: "User logged is not allowed to update the profile details" })
         }
 
 
-        const findUserData = await userModel.findById(userId)
-        if (!findUserData) {
-            return res.status(404).send({ status: false, message: "user not found" })
-        }
 
         let data = req.body
         let address = data.address
@@ -371,11 +376,13 @@ const updateUserDetails = async (req, res) => {
 
 
         /// error 
-        file = req.files
+        files = req.files
        
-        if (file.length>0) {
-
-            const userImage = await uploadFile(file[0])
+        if (files.length>0) {
+            if(!isValidImage(files[0].mimetype)){
+                return res.status(400).send({ status: false, message: "file should be an image file" }) 
+           }
+            const userImage = await uploadFile(files[0])
             obj.profileImage = userImage
 
         }

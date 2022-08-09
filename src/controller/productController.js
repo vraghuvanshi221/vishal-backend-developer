@@ -5,7 +5,7 @@ const { isValid,
     removeExtraSpace,
     isValidSize,
     validName,
-    isValidNumberInt, isValidNumber, isValidTitle } = require("../validator/validation")
+    isValidNumberInt, isValidNumber, isValidTitle,isValidImage } = require("../validator/validation")
 const { uploadFile } = require("../AWS/aws")
 
 
@@ -43,7 +43,7 @@ const createProduct = async function (req, res) {
         }
         newProductDetail.description = description
 
-        if (!(isValid(price) && isValidNumber(price))) {
+        if (!(isValid(price) && isValidNumber(price)&&price>0)) {
             return res.status(400).send({ status: false, message: "Price is mandatory and it should be a valid number." })
         }
         newProductDetail.price = price
@@ -108,15 +108,20 @@ const createProduct = async function (req, res) {
 
         if (isValid(installments)) {
 
-            if (!isValidNumberInt(installments)) {
+            if (!isValidNumberInt(installments)&&installments>0) {
                 return res.status(400).send({ status: false, message: "Number of installments should be a complete figure." })
             }
             newProductDetail.installments = installments
         }
 
 
+
         //uploading Product Image
+        
         if (files && files.length > 0) {
+            if(!isValidImage(files[0].mimetype)){
+                 return res.status(400).send({ status: false, message: "file should be an image file" }) 
+            }
             let uploadedFileURL = await uploadFile(files[0])
             newProductDetail.productImage = uploadedFileURL
         }
@@ -269,7 +274,7 @@ const updateProductDetails = async function (req, res) {
             obj.description = description
         };
         if (price) {
-            if (!(isValid(price) && isValidNumber(price))) return res.status(400).send({ status: false, msg: "Enter valid no in price" });
+            if (!(isValid(price) && isValidNumber(price)&&price>0)) return res.status(400).send({ status: false, msg: "Enter valid no in price" });
             obj.price = price
         };
         if (currencyId) {
@@ -319,12 +324,15 @@ const updateProductDetails = async function (req, res) {
             obj.availableSizes = availableSizes
         };
         if (installments) {
-            if (!(isValid(installments) && isValidNumberInt(installments)))
+            if (!(isValid(installments) && isValidNumberInt(installments)&&installments>0))
                 return res.status(400).send({ status: false, msg: "Enter valid number in installments" });
             obj["$push"] = { installments: installments }
         };
 
         if (files && files.length > 0) {
+            if(!isValidImage(files[0].mimetype)){
+                return res.status(400).send({ status: false, message: "file should be an image file" }) 
+           }
             let uploadedFileURL = await uploadFile(files[0])
             obj.productImage = uploadedFileURL
         }
