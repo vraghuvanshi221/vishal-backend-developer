@@ -390,7 +390,7 @@ const updateUserDetails = async (req, res) => {
 
         }
 
-let updateProfileDetails = await (await userModel.findOneAndUpdate({ _id: userId }, { $set: obj }, { new: true }))
+let updateProfileDetails = await userModel.findOneAndUpdate({ _id: userId }, { $set: obj }, { new: true })
 
         return res.status(200).send({ status: true, message: "Update user profile is successful", data: updateProfileDetails })
     }

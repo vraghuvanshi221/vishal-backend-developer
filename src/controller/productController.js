@@ -109,7 +109,7 @@ const createProduct = async function (req, res) {
 
         if (isValid(installments)) {
 
-            if (!isValidNumberInt(installments)&&installments>0) {
+            if (!(isValidNumberInt(installments)&&installments>0)) {
                 return res.status(400).send({ status: false, message: "Number of installments should be a complete figure." })
             }
             newProductDetail.installments = installments
@@ -325,12 +325,13 @@ const updateProductDetails = async function (req, res) {
             if (!isValidSize(availableSizes)) {
                 return res.status(400).send({ status: false, message: "Sizes should be among [XS, S, M, L, XL, XXL]" })
             }
-            obj.availableSizes = availableSizes
+            
+            obj["$push"]={availableSizes:availableSizes}
         };
         if (installments) {
             if (!(isValid(installments) && isValidNumberInt(installments)&&installments>0))
                 return res.status(400).send({ status: false, msg: "Enter valid number in installments" });
-            obj["$push"] = { installments: installments }
+            obj.installments=installments 
         };
 
         if (files && files.length > 0) {
@@ -342,7 +343,7 @@ const updateProductDetails = async function (req, res) {
         }
 
 
-        const updateProduct = await productModel.findByIdAndUpdate({ _id: productId }, { $set: obj }, { new: true })
+        const updateProduct = await productModel.findByIdAndUpdate({ _id: productId }, obj , { new: true })
 
         return res.status(200).send({ status: true, message: "Successfully update", data: updateProduct })
 
